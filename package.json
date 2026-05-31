@@ -1,6 +1,6 @@
 {
   "name": "react-component-library",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Reusable React component library with HelloWorld and MarkdownTree components.",
   "type": "module",
   "main": "dist/index.cjs.js",
