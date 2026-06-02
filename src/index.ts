@@ -7,10 +7,12 @@ export type {
   MarkdownTreeNode as MarkdownTreeNodeData,
 } from './components/MarkdownTree';
 
-export { ChatDialog } from './components/ChatDialog';
+export { ChatDialog, ChatInputPanel } from './components/ChatDialog';
 export type {
   ChatAttachment,
   ChatDialogProps,
+  ChatInputPanelProps,
+  ChatInputPanelPlacement,
   ChatMessage,
   ChatReply,
   ChatRole,

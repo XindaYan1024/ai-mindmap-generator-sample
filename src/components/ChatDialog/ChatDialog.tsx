@@ -7,6 +7,7 @@ import {
   type KeyboardEvent,
 } from 'react';
 import { ChatMindMapAttachment } from './ChatMindMapAttachment';
+import { ChatInputPanel } from './ChatInputPanel';
 import type { ChatDialogProps, ChatMessage, ChatReply } from './types';
 import './ChatDialog.css';
 
@@ -45,7 +46,6 @@ export const ChatDialog = ({
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const stashedDraftRef = useRef('');
 
-  const listRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const commit = useCallback(
@@ -176,14 +176,6 @@ export const ChatDialog = ({
     }
   };
 
-  // Auto-scroll to the latest message whenever the list grows or pending state
-  // changes (so the typing indicator stays visible).
-  useLayoutEffect(() => {
-    const el = listRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
-  }, [messages, isPending]);
-
   // After a history navigation pulls a value into the input, drop the caret at
   // the end so the user can keep editing the recalled message.
   useLayoutEffect(() => {
@@ -196,6 +188,25 @@ export const ChatDialog = ({
 
   // Reset pending state if the component is unmounted mid-flight.
   useEffect(() => () => setIsPending(false), []);
+
+  // Focus mode: once a reply carries a mind map, the latest one takes over the
+  // whole stage (full width + full height). Find the most recent mind-map
+  // message; -1 means none yet.
+  let lastMindMapIndex = -1;
+  for (let i = messages.length - 1; i >= 0; i -= 1) {
+    if (messages[i]!.attachment?.type === 'mindmap') {
+      lastMindMapIndex = i;
+      break;
+    }
+  }
+  const focusMindMap = lastMindMapIndex !== -1;
+  const focusedMessage = focusMindMap ? messages[lastMindMapIndex]! : null;
+
+  // Expanded history ≈ 1/4 of the dialog when the height is numeric (the common
+  // case); otherwise fall back to a sensible fixed value. Width (≈ 1/3) is
+  // handled purely in CSS so it stays responsive to the dialog's actual width.
+  const panelHistoryHeight =
+    typeof height === 'number' ? Math.round(height / 4) : 120;
 
   return (
     <div
@@ -210,75 +221,31 @@ export const ChatDialog = ({
         </div>
       )}
 
-      <div className="rcl-chat-dialog__messages" ref={listRef}>
-        {messages.length === 0 ? (
-          <p className="rcl-chat-dialog__empty">
-            Ask anything to get started.
-          </p>
-        ) : (
-          messages.map((message) => (
-            <div
-              key={message.id}
-              className={[
-                'rcl-chat-dialog__bubble-row',
-                `rcl-chat-dialog__bubble-row--${message.role}`,
-              ].join(' ')}
-            >
-              <div className="rcl-chat-dialog__bubble-group">
-                {message.content && (
-                  <div
-                    className={[
-                      'rcl-chat-dialog__bubble',
-                      `rcl-chat-dialog__bubble--${message.role}`,
-                    ].join(' ')}
-                  >
-                    {message.content}
-                  </div>
-                )}
-                {message.attachment?.type === 'mindmap' && (
-                  <ChatMindMapAttachment
-                    tree={message.attachment.tree}
-                    height={attachmentHeight}
-                    value={mindMapValue}
-                    onChange={onMindMapChange}
-                  />
-                )}
-              </div>
-            </div>
-          ))
-        )}
-
-        {isPending && (
-          <div className="rcl-chat-dialog__bubble-row rcl-chat-dialog__bubble-row--assistant">
-            <div className="rcl-chat-dialog__bubble rcl-chat-dialog__bubble--assistant rcl-chat-dialog__bubble--typing">
-              <span className="rcl-chat-dialog__dot" />
-              <span className="rcl-chat-dialog__dot" />
-              <span className="rcl-chat-dialog__dot" />
-            </div>
+      {/* Stage: the mind map fills it fullscreen; the input panel floats on top. */}
+      <div className="rcl-chat-dialog__stage">
+        {focusedMessage?.attachment?.type === 'mindmap' && (
+          <div className="rcl-chat-dialog__mindmap-layer">
+            <ChatMindMapAttachment
+              tree={focusedMessage.attachment.tree}
+              height={attachmentHeight}
+              value={mindMapValue}
+              onChange={onMindMapChange}
+            />
           </div>
         )}
-      </div>
 
-      <div className="rcl-chat-dialog__composer">
-        <textarea
-          ref={inputRef}
-          className="rcl-chat-dialog__input"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
+        <ChatInputPanel
+          messages={messages}
+          isPending={isPending}
+          draft={draft}
+          onDraftChange={setDraft}
           onKeyDown={handleKeyDown}
+          onSubmit={() => void handleSubmit()}
+          inputRef={inputRef}
           placeholder={placeholder}
-          rows={1}
-          disabled={isPending}
+          placement={focusMindMap ? 'docked' : 'center'}
+          historyHeight={panelHistoryHeight}
         />
-        <button
-          type="button"
-          className="rcl-chat-dialog__send"
-          onClick={() => void handleSubmit()}
-          disabled={isPending || draft.trim().length === 0}
-          aria-label="Send message"
-        >
-          Send
-        </button>
       </div>
     </div>
   );

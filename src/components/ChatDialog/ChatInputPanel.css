@@ -1,0 +1,247 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   ChatInputPanel — a floating, modern chat panel (input + plain-string
+   history). Positioned absolutely within ChatDialog's stage. Width ≈ 1/3 of
+   the dialog; expanded history height ≈ 1/4 (set inline by ChatDialog).
+   ────────────────────────────────────────────────────────────────────────── */
+
+.rcl-chat-input-panel {
+  position: absolute;
+  left: 50%;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  width: 33.333%;
+  min-width: 280px;
+  max-width: 560px;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: #111827;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+  /* top + transform animate the center → docked move; width/shadow soften the
+     resize. (grid-template-rows on the history wrap handles the collapse.) */
+  transition: top 280ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 280ms cubic-bezier(0.4, 0, 0.2, 1), width 280ms ease,
+    box-shadow 280ms ease;
+}
+
+/* Centered in the dialog (initial state, before any mind map). */
+.rcl-chat-input-panel--center {
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Docked just above the bottom edge once a mind map is on screen. */
+.rcl-chat-input-panel--docked {
+  top: 100%;
+  transform: translate(-50%, calc(-100% - 16px));
+}
+
+/* ── Toolbar (Minimize / Maximize) ──────────────────────────────────────── */
+.rcl-chat-input-panel__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 8px 10px;
+  background: #fafafa;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.rcl-chat-input-panel__tool {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #374151;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease,
+    border-color 120ms ease;
+}
+
+.rcl-chat-input-panel__tool:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.rcl-chat-input-panel__tool:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.rcl-chat-input-panel__tool[aria-pressed='true'] {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #3730a3;
+}
+
+/* ── History (collapsible) ──────────────────────────────────────────────────
+   Minimize collapses the history via a max-height transition: 0 (compact) ↔
+   --rcl-history-h (expanded, ≈ 1/4 of the dialog, set inline by the panel).
+   max-height animates reliably between fixed pixels, unlike `height: auto`. */
+.rcl-chat-input-panel__history-wrap {
+  max-height: var(--rcl-history-h, 120px);
+  overflow: hidden;
+  transition: max-height 260ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rcl-chat-input-panel--compact .rcl-chat-input-panel__history-wrap {
+  max-height: 0;
+}
+
+.rcl-chat-input-panel__history {
+  height: var(--rcl-history-h, 120px);
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.rcl-chat-input-panel__empty {
+  margin: auto;
+  color: #6b7280;
+  font-style: italic;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ── Bubbles (modern chat style) ────────────────────────────────────────── */
+.rcl-chat-input-panel__row {
+  display: flex;
+  width: 100%;
+}
+
+.rcl-chat-input-panel__row--user {
+  justify-content: flex-end;
+}
+
+.rcl-chat-input-panel__row--assistant {
+  justify-content: flex-start;
+}
+
+.rcl-chat-input-panel__bubble {
+  max-width: 82%;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.rcl-chat-input-panel__bubble--user {
+  background: #2563eb;
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+}
+
+.rcl-chat-input-panel__bubble--assistant {
+  background: #f3f4f6;
+  color: #111827;
+  border-bottom-left-radius: 4px;
+}
+
+.rcl-chat-input-panel__bubble--typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 12px;
+}
+
+.rcl-chat-input-panel__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #9ca3af;
+  animation: rcl-cip-dot 1s infinite ease-in-out;
+}
+
+.rcl-chat-input-panel__dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.rcl-chat-input-panel__dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes rcl-cip-dot {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ── Composer (always visible) ──────────────────────────────────────────── */
+.rcl-chat-input-panel__composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fafafa;
+  border-top: 1px solid #f3f4f6;
+}
+
+.rcl-chat-input-panel__input {
+  flex: 1 1 auto;
+  resize: none;
+  min-height: 38px;
+  max-height: 120px;
+  padding: 9px 12px;
+  font: inherit;
+  color: #111827;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.rcl-chat-input-panel__input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+
+.rcl-chat-input-panel__input:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.rcl-chat-input-panel__send {
+  flex: 0 0 auto;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+  background: #2563eb;
+  border: 1px solid #2563eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease,
+    opacity 120ms ease;
+}
+
+.rcl-chat-input-panel__send:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.rcl-chat-input-panel__send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -25,6 +25,33 @@
   color: #111827;
 }
 
+/* ──────────────────────────────────────────────────────────────────────────
+   Stage: the primary area below the header. The mind map fills it fullscreen
+   and the floating ChatInputPanel is positioned over it (position: relative
+   anchors both the panel and the attachment's own fullscreen toggle).
+   ────────────────────────────────────────────────────────────────────────── */
+.rcl-chat-dialog__stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: #f9fafb;
+}
+
+/* Fullscreen mind-map layer — fills the whole stage, no small side panel. */
+.rcl-chat-dialog__mindmap-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+
+/* Drop the inline-card chrome so the map reads as a true fullscreen surface. */
+.rcl-chat-dialog__mindmap-layer .rcl-chat-dialog__attachment {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 .rcl-chat-dialog__messages {
   flex: 1 1 auto;
   min-height: 0;
@@ -34,6 +61,15 @@
   flex-direction: column;
   gap: 8px;
   background: #ffffff;
+}
+
+/* Focus mode: the latest mind map takes over the entire message area. Drop the
+   padding, gap and scroll so the single map row fills the box edge-to-edge
+   instead of sharing space with chat bubbles. */
+.rcl-chat-dialog__messages--focus-mindmap {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
 }
 
 .rcl-chat-dialog__empty {
@@ -62,6 +98,28 @@
   gap: 6px;
   max-width: 86%;
   min-width: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Focus mode: when a message carries a MindMap, the bubble row/group expand
+   so the map fills the dialog by default instead of sitting in a small
+   left-side panel. Layout/styling only — rendering logic, props and the
+   fullscreen toggle are unchanged.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Let the row that holds the map take all remaining vertical space. */
+.rcl-chat-dialog__bubble-row--has-mindmap {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Span the full width (override the 86% chat cap) and grow to the row height
+   so any accompanying text bubble sits on top without competing. */
+.rcl-chat-dialog__bubble-group--has-mindmap {
+  width: 100%;
+  max-width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .rcl-chat-dialog__bubble-row--user .rcl-chat-dialog__bubble-group {
@@ -110,6 +168,35 @@
 .rcl-chat-dialog__attachment--mindmap > .rcl-mind-map {
   border: none;
   border-radius: 0;
+  /* Fill the (now tall) attachment instead of the fixed inline height passed
+     for the small-panel state. `!important` overrides the element's inline
+     `height` without touching the component's props or logic. The fullscreen
+     toggle already passes 100%, so it stays consistent. */
+  height: 100% !important;
+}
+
+/* Focus-mode sizing for the inline (non-fullscreen) map: drop the small fixed
+   panel widths and fill the expanded bubble group, with a gentle entrance. The
+   `--fullscreen` rules below still win when the map is expanded via the toggle
+   (defined after this block, so its absolute positioning takes over). */
+.rcl-chat-dialog__attachment--mindmap {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  flex: 1 1 auto;
+  min-height: 0;
+  animation: rcl-chat-dialog-mindmap-in 220ms ease both;
+}
+
+@keyframes rcl-chat-dialog-mindmap-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .rcl-chat-dialog__attachment--fullscreen {
