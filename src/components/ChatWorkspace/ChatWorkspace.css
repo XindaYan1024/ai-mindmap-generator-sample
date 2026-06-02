@@ -1,0 +1,17 @@
+.rcl-chat-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Make the workspace fill its container (e.g. a full-screen dialog body). */
+.rcl-chat-workspace--fill {
+  width: 100%;
+  min-height: 100%;
+}
+
+.rcl-chat-workspace__section > h2 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}

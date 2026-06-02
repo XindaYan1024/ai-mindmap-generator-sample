@@ -1,0 +1,42 @@
+{
+  "content": "Here is the recommended questions list.",
+  "attachment": {
+    "type": "mindmap",
+    "tree": [
+      {
+        "id": "root",
+        "content": "# Questions\nA sample knowledge tree.",
+        "children": [
+          {
+            "id": "section-1",
+            "content": "## General Knowledge",
+            "children": [
+              {
+                "id": "section-1-q-1",
+                "content": "**What is the capital of France?**\n\nThe capital of France is known for its iconic landmarks such as the Eiffel Tower and the Louvre Museum."
+              },
+              {
+                "id": "section-1-q-2",
+                "content": "**What is the capital of Germany?**\n\nThe capital of Germany is a city rich in history and culture, known for its vibrant arts scene and historical sites."
+              }
+            ]
+          },
+          {
+            "id": "section-2",
+            "content": "## Science",
+            "children": [
+              {
+                "id": "section-2-q-1",
+                "content": "**What is the chemical symbol for water?**\n\nThe chemical symbol for water is derived from its composition of two hydrogen atoms and one oxygen atom."
+              },
+              {
+                "id": "section-2-q-2",
+                "content": "**What planet is known as the Red Planet?**\n\nThe Red Planet is named for its reddish appearance, which is due to iron oxide (rust) on its surface."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

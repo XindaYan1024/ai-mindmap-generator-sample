@@ -1,0 +1,207 @@
+.rcl-mind-map {
+  display: flex;
+  flex-direction: column;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.rcl-mind-map__toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  background: #fafafa;
+}
+
+.rcl-mind-map__toolbar button {
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #111827;
+}
+
+.rcl-mind-map__toolbar button:hover {
+  background: #f3f4f6;
+}
+
+.rcl-mind-map__hint {
+  margin-left: auto;
+  align-self: center;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.rcl-mind-map__canvas {
+  flex: 1 1 auto;
+  position: relative;
+  min-height: 0;
+}
+
+.rcl-mind-map__empty {
+  margin: 0;
+  padding: 24px;
+  color: #6b7280;
+  font-style: italic;
+  text-align: center;
+}
+
+.rcl-mind-map__node {
+  position: relative;
+  width: 220px;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 36px 10px 8px 10px;
+  font-size: 13px;
+  color: #111827;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.rcl-mind-map__node--selected {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.rcl-mind-map__node--drop-target {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.25);
+}
+
+.rcl-mind-map__node-content {
+  margin-bottom: 6px;
+  cursor: grab;
+}
+
+.rcl-mind-map__node:active .rcl-mind-map__node-content {
+  cursor: grabbing;
+}
+
+.rcl-mind-map__markdown {
+  line-height: 1.35;
+}
+
+.rcl-mind-map__markdown :first-child {
+  margin-top: 0;
+}
+
+.rcl-mind-map__markdown :last-child {
+  margin-bottom: 0;
+}
+
+.rcl-mind-map__markdown h1,
+.rcl-mind-map__markdown h2,
+.rcl-mind-map__markdown h3 {
+  margin: 2px 0;
+  font-size: 14px;
+}
+
+.rcl-mind-map__markdown p {
+  margin: 2px 0;
+}
+
+.rcl-mind-map__raw {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+.rcl-mind-map__editor {
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.rcl-mind-map__actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+  z-index: 1;
+}
+
+.rcl-mind-map__icon-btn {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #4b5563;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: background-color 120ms ease, border-color 120ms ease,
+    color 120ms ease, transform 80ms ease;
+}
+
+.rcl-mind-map__icon-btn:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.rcl-mind-map__icon-btn:active {
+  transform: scale(0.92);
+}
+
+.rcl-mind-map__icon-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.rcl-mind-map__icon-btn--delete {
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.rcl-mind-map__icon-btn--delete:hover {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.rcl-mind-map__edit-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.rcl-mind-map__edit-actions button {
+  padding: 3px 8px;
+  font-size: 11px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #111827;
+}
+
+.rcl-mind-map__edit-actions button:hover {
+  background: #f3f4f6;
+}
+
+.rcl-mind-map__handle {
+  width: 8px;
+  height: 8px;
+  background: #6b7280;
+  border: 1px solid #ffffff;
+}
+
+.rcl-mind-map__handle--hidden {
+  opacity: 0;
+  pointer-events: none;
+}

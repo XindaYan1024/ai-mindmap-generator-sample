@@ -1,0 +1,198 @@
+.rcl-md-tree {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: #111827;
+  font-size: 14px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.rcl-md-tree__toolbar {
+  margin-bottom: 12px;
+}
+
+.rcl-md-tree__toolbar button,
+.rcl-md-tree__actions button:not(.rcl-md-tree__icon-btn) {
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #111827;
+}
+
+.rcl-md-tree__toolbar button:hover,
+.rcl-md-tree__actions button:not(.rcl-md-tree__icon-btn):hover {
+  background: #f3f4f6;
+}
+
+.rcl-md-tree__icon-btn {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #4b5563;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: background-color 120ms ease, border-color 120ms ease,
+    color 120ms ease, transform 80ms ease;
+}
+
+.rcl-md-tree__icon-btn:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.rcl-md-tree__icon-btn:active {
+  transform: scale(0.92);
+}
+
+.rcl-md-tree__icon-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.rcl-md-tree__icon-btn--delete {
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.rcl-md-tree__icon-btn--delete:hover {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.rcl-md-tree__empty {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.rcl-md-tree__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rcl-md-tree__list--overlay {
+  pointer-events: none;
+}
+
+.rcl-md-tree__item {
+  margin: 4px 0;
+  box-sizing: border-box;
+}
+
+.rcl-md-tree__item--dragging .rcl-md-tree__row {
+  opacity: 0.35;
+}
+
+.rcl-md-tree__item--overlay .rcl-md-tree__row {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  cursor: grabbing;
+  background: #ffffff;
+}
+
+.rcl-md-tree__row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #f9fafb;
+  border: 1px solid #f3f4f6;
+}
+
+.rcl-md-tree__row:hover {
+  background: #f3f4f6;
+}
+
+.rcl-md-tree__handle {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: grab;
+  font-size: 14px;
+  padding: 0;
+  border-radius: 4px;
+  touch-action: none;
+  user-select: none;
+}
+
+.rcl-md-tree__handle:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.rcl-md-tree__handle:active {
+  cursor: grabbing;
+}
+
+.rcl-md-tree__content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-right: 100px;
+}
+
+.rcl-md-tree__markdown {
+  line-height: 1.4;
+}
+
+.rcl-md-tree__markdown :first-child {
+  margin-top: 0;
+}
+
+.rcl-md-tree__markdown :last-child {
+  margin-bottom: 0;
+}
+
+.rcl-md-tree__markdown h1,
+.rcl-md-tree__markdown h2,
+.rcl-md-tree__markdown h3 {
+  margin: 4px 0;
+  font-size: 15px;
+}
+
+.rcl-md-tree__markdown p {
+  margin: 4px 0;
+}
+
+.rcl-md-tree__raw {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+.rcl-md-tree__editor {
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.rcl-md-tree__actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+  z-index: 1;
+}
