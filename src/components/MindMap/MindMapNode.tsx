@@ -7,6 +7,7 @@ import {
 } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import ReactMarkdown from 'react-markdown';
+import { NODE_WIDTH, LEAF_NODE_WIDTH } from './layout';
 
 export interface MindMapNodeData {
   content: string;
@@ -77,9 +78,11 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
       ]
         .filter(Boolean)
         .join(' ')}
-      style={
-        appearDelay ? { animationDelay: `${appearDelay}ms` } : undefined
-      }
+      style={{
+        // Leaf nodes are twice as wide; height is left to content as before.
+        width: hasChildren ? NODE_WIDTH : LEAF_NODE_WIDTH,
+        ...(appearDelay ? { animationDelay: `${appearDelay}ms` } : {}),
+      }}
       onDoubleClick={handleDoubleClick}
     >
       {hasParent && (

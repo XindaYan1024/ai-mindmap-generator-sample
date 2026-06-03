@@ -1,12 +1,20 @@
 import type { MarkdownTreeNode } from '../MarkdownTree/types';
 import type { LayoutPosition } from './types';
 
-export const NODE_WIDTH = 220;
+// Single source of truth for node width — drives layout spacing, the ReactFlow
+// node width, drag hit-testing, and the rendered node box. 1.5× the 220 base.
+export const NODE_WIDTH = 220 * 1.5;
+// Leaf nodes (no children) render twice as wide as a normal node; height is
+// unchanged. Derived from NODE_WIDTH so it tracks the single width source.
+export const LEAF_NODE_WIDTH = NODE_WIDTH * 2;
 export const NODE_HEIGHT = 80;
 
 // Layered tree tuning.
 const LEVEL_GAP_X = 90; // horizontal gap between levels
 const GAP_Y = 30; // vertical gap between sibling leaf rows
+// Extra breathing room between leaf rows only (readability). Applied to the
+// leaf gap; non-leaf nodes are unaffected. Tune in one place.
+const LEAF_GAP_MULTIPLIER = 1.5;
 
 /**
  * Left-to-right layered tree layout. Every node at the same depth shares one
@@ -34,7 +42,8 @@ export const layoutTree = (
     if (children.length === 0) {
       const y = yCursor.value;
       positions.set(node.id, { x, y });
-      yCursor.value += NODE_HEIGHT + GAP_Y;
+      // Leaf-only: widen the vertical gap between consecutive leaf rows.
+      yCursor.value += NODE_HEIGHT + GAP_Y * LEAF_GAP_MULTIPLIER;
       return y;
     }
 

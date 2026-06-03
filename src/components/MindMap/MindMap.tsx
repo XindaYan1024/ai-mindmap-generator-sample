@@ -23,6 +23,7 @@ import {
   collectEdges,
   flattenForMindMap,
   NODE_WIDTH,
+  LEAF_NODE_WIDTH,
   NODE_HEIGHT,
 } from './layout';
 import {
@@ -188,17 +189,20 @@ const MindMapInner = ({
       flatItems.map((item) => {
         const pos =
           overrides.get(item.id) ?? autoPositions.get(item.id) ?? { x: 0, y: 0 };
+        const hasChildren = (childCountByParent.get(item.id) ?? 0) > 0;
         return {
           id: item.id,
           type: 'mindmap',
           position: pos,
-          width: NODE_WIDTH,
+          // Leaf nodes are twice as wide — keep ReactFlow's width in sync so
+          // measurement and drag hit-testing match the rendered box.
+          width: hasChildren ? NODE_WIDTH : LEAF_NODE_WIDTH,
           data: {
             content: item.content,
             renderMarkdown,
             editable,
             hasParent: item.parentId !== null,
-            hasChildren: (childCountByParent.get(item.id) ?? 0) > 0,
+            hasChildren,
             isDropTarget: dropTargetId === item.id,
             appearDelay: (depthById.get(item.id) ?? 0) * LEVEL_APPEAR_DELAY,
             onAddChild: (id: string) => handlersRef.current.handleAddChild(id),

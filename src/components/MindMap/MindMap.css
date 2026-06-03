@@ -53,7 +53,7 @@
 
 .rcl-mind-map__node {
   position: relative;
-  width: 220px;
+  /* Width is set inline from the NODE_WIDTH constant (single source of truth). */
   background: #f3f4f6;
   border: 1px solid #d1d5db;
   border-radius: 8px;
