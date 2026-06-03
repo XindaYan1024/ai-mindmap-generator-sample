@@ -1,4 +1,10 @@
-import { memo, useEffect, useState } from 'react';
+import {
+  memo,
+  useEffect,
+  useState,
+  type KeyboardEvent,
+  type MouseEvent,
+} from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import ReactMarkdown from 'react-markdown';
 
@@ -17,35 +23,6 @@ export interface MindMapNodeData {
   [key: string]: unknown;
 }
 
-const PlusIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" fill="none">
-    <path
-      d="M6 2v8M2 6h8"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
-const PencilIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true" fill="none">
-    <path
-      d="M11.5 1.9a1.6 1.6 0 0 1 2.26 2.26L5.0 12.93 2 13.9l.97-3.0L11.5 1.9z"
-      stroke="currentColor"
-      strokeWidth="1.3"
-      strokeLinejoin="round"
-      strokeLinecap="round"
-    />
-    <path
-      d="M10.4 3.0l2.6 2.6"
-      stroke="currentColor"
-      strokeWidth="1.3"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
 const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
   const {
     content,
@@ -55,7 +32,6 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
     hasChildren,
     isDropTarget,
     appearDelay,
-    onAddChild,
     onUpdate,
   } = data as MindMapNodeData;
 
@@ -75,6 +51,22 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
     setIsEditing(false);
   };
 
+  // Enter edit mode on double-click. stopPropagation keeps ReactFlow's
+  // zoom-on-double-click from firing for the node itself.
+  const handleDoubleClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (!editable || isEditing) return;
+    event.stopPropagation();
+    setIsEditing(true);
+  };
+
+  // Escape discards edits; clicking outside the field (blur) saves them.
+  const handleEditorKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      cancel();
+    }
+  };
+
   return (
     <div
       className={[
@@ -88,6 +80,7 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
       style={
         appearDelay ? { animationDelay: `${appearDelay}ms` } : undefined
       }
+      onDoubleClick={handleDoubleClick}
     >
       {hasParent && (
         <Handle
@@ -97,40 +90,17 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
         />
       )}
 
-      {!isEditing && hasChildren && (
-        <div className="rcl-mind-map__actions nodrag">
-          <button
-            type="button"
-            className="rcl-mind-map__icon-btn rcl-mind-map__icon-btn--add"
-            onClick={() => onAddChild(id)}
-            aria-label="Add child"
-            title="Add child"
-          >
-            <PlusIcon />
-          </button>
-          {editable && (
-            <button
-              type="button"
-              className="rcl-mind-map__icon-btn rcl-mind-map__icon-btn--edit"
-              onClick={() => setIsEditing(true)}
-              aria-label="Edit"
-              title="Edit"
-            >
-              <PencilIcon />
-            </button>
-          )}
-        </div>
-      )}
-
       <div className="rcl-mind-map__node-content">
         {isEditing ? (
           <textarea
-            className="rcl-mind-map__editor"
+            className="rcl-mind-map__editor nodrag"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             rows={Math.max(2, draft.split('\n').length)}
             autoFocus
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={handleEditorKeyDown}
+            onBlur={commit}
           />
         ) : renderMarkdown ? (
           <div className="rcl-mind-map__markdown">
@@ -140,13 +110,6 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
           <pre className="rcl-mind-map__raw">{content}</pre>
         )}
       </div>
-
-      {isEditing && (
-        <div className="rcl-mind-map__edit-actions nodrag">
-          <button type="button" onClick={commit}>Save</button>
-          <button type="button" onClick={cancel}>Cancel</button>
-        </div>
-      )}
 
       {hasChildren && (
         <Handle

@@ -31,6 +31,7 @@ import {
   updateItemDeep,
   moveNode,
   findNode,
+  findParent,
   collectDescendantIds,
 } from './tree';
 import './MindMap.css';
@@ -88,6 +89,22 @@ const MindMapInner = ({
     (parentId: string) => {
       const newNode: MarkdownTreeNode = { id: generateId(), content: 'New child' };
       commit(addChildDeep(tree, parentId, newNode));
+    },
+    [tree, commit],
+  );
+
+  // Add a node at the same level as `id` (same parent). Roots have no parent,
+  // so adding a sibling there is a no-op. Reuses the existing creation +
+  // insertion utilities — no new data logic.
+  const handleAddSibling = useCallback(
+    (id: string) => {
+      const parent = findParent(tree, id);
+      if (!parent) return; // root node → safely ignore
+      const newNode: MarkdownTreeNode = {
+        id: generateId(),
+        content: 'New sibling',
+      };
+      commit(addChildDeep(tree, parent.id, newNode));
     },
     [tree, commit],
   );
@@ -375,6 +392,17 @@ const MindMapInner = ({
             y={contextMenu.y}
             onClose={() => setContextMenu(null)}
             items={[
+              {
+                label: 'Add child',
+                // Reuse the EXISTING add-child logic unchanged.
+                onSelect: () => handleAddChild(contextMenu.nodeId),
+              },
+              {
+                label: 'Add sibling node',
+                // Disabled for roots (no parent to attach a sibling to).
+                disabled: !findParent(tree, contextMenu.nodeId),
+                onSelect: () => handleAddSibling(contextMenu.nodeId),
+              },
               {
                 label: 'Delete node',
                 danger: true,
