@@ -143,7 +143,7 @@ export const ChatInputPanel = ({
         <div className="rcl-chat-input-panel__history" ref={listRef}>
           {textMessages.length === 0 && !isPending ? (
             <p className="rcl-chat-input-panel__empty">
-              Ask anything to get started.
+              Ask the Mindmap assistant to generate template questions...
             </p>
           ) : (
             textMessages.map((message) => (

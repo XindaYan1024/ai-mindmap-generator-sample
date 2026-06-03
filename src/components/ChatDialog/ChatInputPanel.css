@@ -27,9 +27,10 @@
     box-shadow 280ms ease;
 }
 
-/* Centered in the dialog (initial state, before any mind map). */
+/* Centered in the dialog (initial state, before any mind map). Nudged a little
+   below the vertical center so it sits lower in the dialog. */
 .rcl-chat-input-panel--center {
-  top: 50%;
+  top: 62%;
   transform: translate(-50%, -50%);
 }
 
@@ -228,7 +229,8 @@
   font-size: 13px;
   font-weight: 500;
   color: #ffffff;
-  background: #2563eb;
+  /* background: #2563eb; */
+  background: light-dark(#e24ab7, #60cdff);
   border: 1px solid #2563eb;
   border-radius: 12px;
   cursor: pointer;
