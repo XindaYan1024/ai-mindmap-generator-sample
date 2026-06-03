@@ -217,7 +217,7 @@ export const ChatDialog = ({
     >
       {title && (
         <div className="rcl-chat-dialog__header">
-          <span className="rcl-chat-dialog__title">{title}</span>
+          <span className="rcl-chat-dialog__title">Mindmap AI Template Assistant</span>
         </div>
       )}
 

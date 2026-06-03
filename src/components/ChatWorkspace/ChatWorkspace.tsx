@@ -85,7 +85,7 @@ export const ChatWorkspace = ({
 
       {showChat && (
         <section className="rcl-chat-workspace__section">
-          {resolvedLabels && <h2>{resolvedLabels.chat}</h2>}
+          {/* {resolvedLabels && <h2>{resolvedLabels.chat}</h2>} */}
           <ChatDialog
             height={chatHeight}
             attachmentHeight={chatAttachmentHeight}
