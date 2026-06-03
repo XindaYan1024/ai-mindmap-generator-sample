@@ -38,6 +38,10 @@ import './MindMap.css';
 const generateId = () =>
   `node-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
+// Per-level stagger (ms) for the node enter animation, so layers fade/scale in
+// one after another in BFS order. Purely presentational.
+const LEVEL_APPEAR_DELAY = 130;
+
 const nodeTypes: NodeTypes = {
   mindmap: MindMapNode,
 };
@@ -138,6 +142,20 @@ const MindMapInner = ({
   const flatItems = useMemo(() => flattenForMindMap(tree), [tree]);
   const autoPositions = useMemo(() => layoutTree(tree), [tree]);
 
+  // Depth of each node (root = 0), used only to stagger the enter animation by
+  // level. Derived from the tree; does not change any data.
+  const depthById = useMemo(() => {
+    const map = new Map<string, number>();
+    const walk = (nodes: MarkdownTreeNode[], depth: number) => {
+      for (const n of nodes) {
+        map.set(n.id, depth);
+        walk(n.children ?? [], depth + 1);
+      }
+    };
+    walk(tree, 0);
+    return map;
+  }, [tree]);
+
   const childCountByParent = useMemo(() => {
     const map = new Map<string, number>();
     for (const item of flatItems) {
@@ -165,6 +183,7 @@ const MindMapInner = ({
             hasParent: item.parentId !== null,
             hasChildren: (childCountByParent.get(item.id) ?? 0) > 0,
             isDropTarget: dropTargetId === item.id,
+            appearDelay: (depthById.get(item.id) ?? 0) * LEVEL_APPEAR_DELAY,
             onAddChild: (id: string) => handlersRef.current.handleAddChild(id),
             onDelete: (id: string) => handlersRef.current.handleDelete(id),
             onUpdate: (id: string, c: string) =>
@@ -177,6 +196,7 @@ const MindMapInner = ({
       overrides,
       autoPositions,
       childCountByParent,
+      depthById,
       renderMarkdown,
       editable,
       dropTargetId,

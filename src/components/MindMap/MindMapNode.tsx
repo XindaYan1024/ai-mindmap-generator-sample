@@ -9,6 +9,8 @@ export interface MindMapNodeData {
   hasParent: boolean;
   hasChildren: boolean;
   isDropTarget: boolean;
+  /** Delay (ms) before this node's enter animation starts — staggers by level. */
+  appearDelay?: number;
   onAddChild: (id: string) => void;
   onDelete: (id: string) => void;
   onUpdate: (id: string, content: string) => void;
@@ -52,6 +54,7 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
     hasParent,
     hasChildren,
     isDropTarget,
+    appearDelay,
     onAddChild,
     onUpdate,
   } = data as MindMapNodeData;
@@ -76,11 +79,15 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
     <div
       className={[
         'rcl-mind-map__node',
+        'rcl-mind-map__node--enter',
         selected ? 'rcl-mind-map__node--selected' : '',
         isDropTarget ? 'rcl-mind-map__node--drop-target' : '',
       ]
         .filter(Boolean)
         .join(' ')}
+      style={
+        appearDelay ? { animationDelay: `${appearDelay}ms` } : undefined
+      }
     >
       {hasParent && (
         <Handle

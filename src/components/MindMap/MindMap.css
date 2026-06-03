@@ -63,6 +63,33 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
+/* Enter animation: scale-in + fade-in. Runs once per node on mount; combined
+   with the per-level `animation-delay` set inline, layers appear in BFS order.
+   Transform/opacity only, so it stays GPU-friendly. `both` holds the start
+   frame during the delay and the end frame after, so positioning is unaffected
+   (ReactFlow translates the wrapper, not this inner element). */
+@keyframes rcl-mind-map-node-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.rcl-mind-map__node--enter {
+  animation: rcl-mind-map-node-in 260ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+/* Respect reduced-motion: skip the animation entirely (never hide the node). */
+@media (prefers-reduced-motion: reduce) {
+  .rcl-mind-map__node--enter {
+    animation: none;
+  }
+}
+
 .rcl-mind-map__node--selected {
   border-color: #2563eb;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);

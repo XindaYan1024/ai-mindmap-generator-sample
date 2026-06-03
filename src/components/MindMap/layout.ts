@@ -3,13 +3,21 @@ import type { LayoutPosition } from './types';
 
 export const NODE_WIDTH = 220;
 export const NODE_HEIGHT = 80;
-const GAP_X = 80;
-const GAP_Y = 24;
+
+// Layered tree tuning.
+const LEVEL_GAP_X = 90; // horizontal gap between levels
+const GAP_Y = 30; // vertical gap between sibling leaf rows
 
 /**
- * Compute a simple horizontal tree layout: root(s) on the left, children to the right.
- * Each leaf claims one vertical slot; internal nodes are vertically centered on their
- * children.
+ * Left-to-right layered tree layout. Every node at the same depth shares one
+ * vertical axis (identical `x`), so each level reads as a clean column. Leaves
+ * are packed into successive rows top-to-bottom and each parent is centered
+ * vertically over the span of its children, producing a classic hierarchical
+ * tree that expands rightward from the root.
+ *
+ * Returns the same `Map<id, {x, y}>` contract as before — positions are the
+ * node's top-left corner. Because all nodes share one height, centering the
+ * top-left over the children's span also centers the node over them.
  */
 export const layoutTree = (
   tree: MarkdownTreeNode[],
@@ -17,9 +25,11 @@ export const layoutTree = (
   const positions = new Map<string, LayoutPosition>();
   const yCursor = { value: 0 };
 
+  // Place `node` and its subtree, returning the node's y so the parent can
+  // center itself over its children. x is fixed by depth → shared per level.
   const place = (node: MarkdownTreeNode, depth: number): number => {
     const children = node.children ?? [];
-    const x = depth * (NODE_WIDTH + GAP_X);
+    const x = depth * (NODE_WIDTH + LEVEL_GAP_X);
 
     if (children.length === 0) {
       const y = yCursor.value;
@@ -36,6 +46,7 @@ export const layoutTree = (
 
   for (const root of tree) {
     place(root, 0);
+    // Extra gap so independent root subtrees don't touch.
     yCursor.value += GAP_Y;
   }
 
