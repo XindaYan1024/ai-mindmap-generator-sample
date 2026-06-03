@@ -44,17 +44,6 @@ const PencilIcon = () => (
   </svg>
 );
 
-const CloseIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" fill="none">
-    <path
-      d="M3 3l6 6M9 3l-6 6"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
 const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
   const {
     content,
@@ -64,7 +53,6 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
     hasChildren,
     isDropTarget,
     onAddChild,
-    onDelete,
     onUpdate,
   } = data as MindMapNodeData;
 
@@ -124,15 +112,6 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
               <PencilIcon />
             </button>
           )}
-          <button
-            type="button"
-            className="rcl-mind-map__icon-btn rcl-mind-map__icon-btn--delete"
-            onClick={() => onDelete(id)}
-            aria-label="Delete"
-            title="Delete"
-          >
-            <CloseIcon />
-          </button>
         </div>
       )}
 

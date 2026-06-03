@@ -1,7 +1,7 @@
 {
-  "name": "react-component-library",
+  "name": "ai-mindmap-generator-sample",
   "version": "1.0.6",
-  "description": "Reusable React component library with HelloWorld and MarkdownTree components.",
+  "description": "AI mind map generator with MindMap, MarkdownTree, and Chat components.",
   "type": "module",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",

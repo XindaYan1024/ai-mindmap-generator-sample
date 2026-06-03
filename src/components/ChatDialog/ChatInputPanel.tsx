@@ -116,26 +116,27 @@ export const ChatInputPanel = ({
       aria-label="Chat input"
     >
       <div className="rcl-chat-input-panel__toolbar">
-        <button
-          type="button"
-          className="rcl-chat-input-panel__tool"
-          onClick={() => setMode('expanded')}
-          aria-pressed={mode === 'expanded'}
-          aria-label="Maximize"
-          title="Maximize"
-        >
-          <MaximizeIcon />
-        </button>
-        <button
-          type="button"
-          className="rcl-chat-input-panel__tool"
-          onClick={() => setMode('compact')}
-          aria-pressed={mode === 'compact'}
-          aria-label="Minimize"
-          title="Minimize"
-        >
-          <MinimizeIcon />
-        </button>
+        {mode === 'compact' ? (
+          <button
+            type="button"
+            className="rcl-chat-input-panel__tool"
+            onClick={() => setMode('expanded')}
+            aria-label="Maximize"
+            title="Maximize"
+          >
+            <MaximizeIcon />
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="rcl-chat-input-panel__tool"
+            onClick={() => setMode('compact')}
+            aria-label="Minimize"
+            title="Minimize"
+          >
+            <MinimizeIcon />
+          </button>
+        )}
       </div>
 
       <div className="rcl-chat-input-panel__history-wrap">

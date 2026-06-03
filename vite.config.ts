@@ -7,7 +7,7 @@ export default defineConfig({
   root: resolve(__dirname, 'example'),
   resolve: {
     alias: {
-      'react-component-library': resolve(__dirname, 'src/index.ts'),
+      'ai-mindmap-generator-sample': resolve(__dirname, 'src/index.ts'),
     },
   },
   server: {

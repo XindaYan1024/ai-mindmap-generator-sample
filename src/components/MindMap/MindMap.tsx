@@ -17,6 +17,7 @@ import '@xyflow/react/dist/style.css';
 import type { MarkdownTreeNode } from '../MarkdownTree/types';
 import type { MindMapProps, LayoutPosition } from './types';
 import { MindMapNode } from './MindMapNode';
+import { ContextMenu } from './ContextMenu';
 import {
   layoutTree,
   collectEdges,
@@ -60,6 +61,15 @@ const MindMapInner = ({
   const [dropTargetId, setDropTargetId] = useState<string | null>(null);
   const dropTargetIdRef = useRef<string | null>(null);
 
+  // Right-click context menu state (additive, UI-only). `nodeId` is the node
+  // the menu acts on; x/y are coordinates relative to the canvas container.
+  const [contextMenu, setContextMenu] = useState<{
+    nodeId: string;
+    x: number;
+    y: number;
+  } | null>(null);
+  const canvasRef = useRef<HTMLDivElement | null>(null);
+
   const { getNodes } = useReactFlow();
 
   const commit = useCallback(
@@ -96,6 +106,22 @@ const MindMapInner = ({
       commit(updateItemDeep(tree, id, content));
     },
     [tree, commit],
+  );
+
+  // Open the context menu at the cursor when a node is right-clicked. Position
+  // is computed relative to the canvas so the menu (absolutely positioned
+  // inside it) lands under the pointer. Does not touch any existing handler.
+  const handleNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      event.preventDefault();
+      const rect = canvasRef.current?.getBoundingClientRect();
+      setContextMenu({
+        nodeId: node.id,
+        x: rect ? event.clientX - rect.left : event.clientX,
+        y: rect ? event.clientY - rect.top : event.clientY,
+      });
+    },
+    [],
   );
 
   const handleAddRoot = () => {
@@ -294,7 +320,7 @@ const MindMapInner = ({
         </span>
       </div>
 
-      <div className="rcl-mind-map__canvas">
+      <div className="rcl-mind-map__canvas" ref={canvasRef}>
         {nodes.length === 0 ? (
           <p className="rcl-mind-map__empty">
             No nodes yet. Click <strong>+ Add root node</strong> to start, or
@@ -308,6 +334,7 @@ const MindMapInner = ({
             onNodesChange={onNodesChange}
             onNodeDrag={handleNodeDrag}
             onNodeDragStop={handleNodeDragStop}
+            onNodeContextMenu={handleNodeContextMenu}
             fitView
             fitViewOptions={{ padding: 0.2 }}
             minZoom={0.2}
@@ -320,6 +347,22 @@ const MindMapInner = ({
             <Controls showInteractive={false} />
             <MiniMap pannable zoomable />
           </ReactFlow>
+        )}
+
+        {contextMenu && (
+          <ContextMenu
+            x={contextMenu.x}
+            y={contextMenu.y}
+            onClose={() => setContextMenu(null)}
+            items={[
+              {
+                label: 'Delete node',
+                danger: true,
+                // Reuse the EXISTING delete logic unchanged.
+                onSelect: () => handleDelete(contextMenu.nodeId),
+              },
+            ]}
+          />
         )}
       </div>
     </div>

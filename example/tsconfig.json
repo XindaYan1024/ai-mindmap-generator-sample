@@ -6,7 +6,7 @@
     "outDir": null,
     "noEmit": true,
     "paths": {
-      "react-component-library": ["../src/index.ts"]
+      "ai-mindmap-generator-sample": ["../src/index.ts"]
     }
   },
   "include": ["./**/*"]

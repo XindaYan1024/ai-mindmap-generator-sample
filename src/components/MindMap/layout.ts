@@ -60,16 +60,35 @@ export const collectEdges = (
 };
 
 /**
- * Walk the tree and return a flat array of nodes in DFS order, with their parent ID.
+ * Walk the tree and return a flat array of nodes in level-order (BFS), with
+ * their parent ID: root(s) first, then every direct child, then each deeper
+ * level in turn. Rendering follows this array, so the map mounts hierarchically
+ * — a parent is always emitted before its children, and all nodes of one level
+ * precede any node of the next.
+ *
+ * Implemented as recursion over levels: each call emits the current level and
+ * recurses into the level it collects. Output shape and parent-child links are
+ * identical to before — only the ordering changed.
  */
 export const flattenForMindMap = (
   tree: MarkdownTreeNode[],
 ): Array<{ id: string; content: string; parentId: string | null }> => {
   const out: Array<{ id: string; content: string; parentId: string | null }> = [];
-  const visit = (node: MarkdownTreeNode, parentId: string | null) => {
-    out.push({ id: node.id, content: node.content, parentId });
-    for (const child of node.children ?? []) visit(child, node.id);
+
+  type LevelEntry = { node: MarkdownTreeNode; parentId: string | null };
+
+  const visitLevel = (level: LevelEntry[]) => {
+    if (level.length === 0) return;
+    const nextLevel: LevelEntry[] = [];
+    for (const { node, parentId } of level) {
+      out.push({ id: node.id, content: node.content, parentId });
+      for (const child of node.children ?? []) {
+        nextLevel.push({ node: child, parentId: node.id });
+      }
+    }
+    visitLevel(nextLevel);
   };
-  tree.forEach((root) => visit(root, null));
+
+  visitLevel(tree.map((root) => ({ node: root, parentId: null })));
   return out;
 };

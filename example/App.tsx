@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   ChatWorkspace,
   type MarkdownTreeNodeData,
-} from 'react-component-library';
+} from 'ai-mindmap-generator-sample';
 import questionReply from '../src/question.json';
 
 const initialTree = questionReply.attachment.tree as MarkdownTreeNodeData[];
@@ -66,6 +66,10 @@ export const App = () => {
     setJsonError(null);
     setTree(nextTree);
     const content = (parsed as PastedReply).content;
+    console.log('yanx2', {
+      content: typeof content === 'string' ? content : '',
+      attachment: { type: 'mindmap', tree: nextTree },
+    })
     setMindMapJson({
       content: typeof content === 'string' ? content : '',
       attachment: { type: 'mindmap', tree: nextTree },
