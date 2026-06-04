@@ -1,0 +1,123 @@
+{
+  "topics": [
+    {
+      "title": "Brand Story & Heritage",
+      "subtopics": [
+        {
+          "title": "Company history and founding story",
+          "description": "Share how the company was founded, the inspiration behind it, and how it has evolved over time."
+        },
+        {
+          "title": "Brewing philosophy and values",
+          "description": "Explain the principles that guide your brewing process, such as craftsmanship, innovation, or tradition."
+        },
+        {
+          "title": "Awards or recognition",
+          "description": "Highlight any industry awards or recognitions that demonstrate the quality and credibility of your products."
+        }
+      ]
+    },
+    {
+      "title": "Product Portfolio Overview",
+      "subtopics": [
+        {
+          "title": "Types of beer (lager, ale, IPA, stout, etc.)",
+          "description": "Introduce the different beer styles your company offers and their general characteristics."
+        },
+        {
+          "title": "Key flagship products",
+          "description": "Present your most popular or representative beers that best reflect your brand identity."
+        },
+        {
+          "title": "Seasonal or limited-edition offerings",
+          "description": "Showcase special products that are available for a limited time to create excitement and exclusivity."
+        }
+      ]
+    },
+    {
+      "title": "Brewing Process & Quality",
+      "subtopics": [
+        {
+          "title": "Ingredients (hops, malt, yeast, water source)",
+          "description": "Describe the key ingredients used and how their quality impacts the flavor of the beer."
+        },
+        {
+          "title": "Brewing techniques and craftsmanship",
+          "description": "Explain the brewing methods and skills involved in creating consistent, high-quality beer."
+        },
+        {
+          "title": "Quality control standards",
+          "description": "Emphasize the processes used to ensure every batch meets strict quality and safety standards."
+        }
+      ]
+    },
+    {
+      "title": "Taste Profiles & Pairing Suggestions",
+      "subtopics": [
+        {
+          "title": "Flavor notes of each major product",
+          "description": "Describe the aroma, taste, and mouthfeel characteristics of your main beers."
+        },
+        {
+          "title": "Food pairing recommendations",
+          "description": "Suggest which foods pair well with different beers to enhance the overall experience."
+        },
+        {
+          "title": "Ideal serving temperature and glassware",
+          "description": "Explain how temperature and glass selection can improve the taste and presentation of the beer."
+        }
+      ]
+    },
+    {
+      "title": "Market Position & Competitive Advantage",
+      "subtopics": [
+        {
+          "title": "Unique selling points (USP)",
+          "description": "Identify what makes your beer stand out from competitors, such as flavor, ingredients, or brand story."
+        },
+        {
+          "title": "Comparison with competitors",
+          "description": "Briefly explain how your products differ from other brands in terms of quality, price, or positioning."
+        },
+        {
+          "title": "Target customer segments",
+          "description": "Define the main types of customers your products are designed for, such as casual drinkers or craft beer enthusiasts."
+        }
+      ]
+    },
+    {
+      "title": "Sales & Promotion Opportunities",
+      "subtopics": [
+        {
+          "title": "Best-selling products and trends",
+          "description": "Highlight your top-performing products and current market trends that drive sales."
+        },
+        {
+          "title": "Promotional campaigns or discounts",
+          "description": "Present any ongoing or upcoming promotions that can help boost customer interest and sales."
+        },
+        {
+          "title": "Merchandising suggestions (display ideas, bundling)",
+          "description": "Provide ideas on how to display and bundle products to attract customers and increase purchases."
+        }
+      ]
+    },
+    {
+      "title": "Customer Success & Use Cases",
+      "subtopics": [
+        {
+          "title": "Successful client examples (bars, restaurants, retailers)",
+          "description": "Share real cases where your products performed well in different business settings."
+        },
+        {
+          "title": "Sales performance stories",
+          "description": "Describe how certain strategies or products have led to increased sales for your partners."
+        },
+        {
+          "title": "Customer feedback or testimonials",
+          "description": "Include positive feedback from customers to build trust and credibility."
+        }
+      ]
+    }
+  ]
+}
