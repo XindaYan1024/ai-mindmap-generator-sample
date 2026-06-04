@@ -1,3 +1,23 @@
+# Environment secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Claude AI memory files
+CLAUDE.md
+.claude/
+
+# Python (backend)
+backend/.venv/
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Node (frontend)
 node_modules
 dist
 .DS_Store

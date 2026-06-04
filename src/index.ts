@@ -1,9 +1,16 @@
 export { MindMap } from './components/MindMap';
 export type { MindMapProps } from './components/MindMap';
 
-export { MarkdownTree } from './components/MarkdownTree';
+export {
+  MarkdownTree,
+  MarkdownEditor,
+  treeToMarkdown,
+  markdownToTree,
+} from './components/MarkdownTree';
 export type {
   MarkdownTreeProps,
+  MarkdownTreeMode,
+  MarkdownEditorProps,
   MarkdownTreeNode as MarkdownTreeNodeData,
 } from './components/MarkdownTree';
 

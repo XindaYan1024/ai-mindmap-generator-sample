@@ -19,6 +19,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { SortableTreeItem } from './SortableTreeItem';
+import { MarkdownEditor } from './MarkdownEditor';
+import { treeToMarkdown, markdownToTree } from './markdown';
 import {
   flattenTree,
   buildTree,
@@ -29,7 +31,11 @@ import {
   addChildDeep,
   type Projection,
 } from './utils';
-import type { MarkdownTreeNode, MarkdownTreeProps } from './types';
+import type {
+  MarkdownTreeMode,
+  MarkdownTreeNode,
+  MarkdownTreeProps,
+} from './types';
 import './MarkdownTree.css';
 
 const INDENTATION_WIDTH = 24;
@@ -44,12 +50,26 @@ export const MarkdownTree = ({
   renderMarkdown = true,
   editable = true,
   className,
+  enableMarkdownMode = true,
+  defaultMode = 'tree',
+  onModeChange,
 }: MarkdownTreeProps) => {
   const isControlled = value !== undefined;
   const [internal, setInternal] = useState<MarkdownTreeNode[]>(
     defaultValue ?? [],
   );
   const tree = isControlled ? (value as MarkdownTreeNode[]) : internal;
+
+  // Mode switching: the tree stays the single source of truth. In markdown
+  // mode we hold a text draft that is parsed back into the tree on every edit,
+  // and (re)seeded from the tree whenever we enter the mode — so switching
+  // either way preserves data consistency without a reload.
+  const [mode, setMode] = useState<MarkdownTreeMode>(
+    enableMarkdownMode ? defaultMode : 'tree',
+  );
+  const [markdownDraft, setMarkdownDraft] = useState(() =>
+    enableMarkdownMode && defaultMode === 'markdown' ? treeToMarkdown(tree) : '',
+  );
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
@@ -85,6 +105,26 @@ export const MarkdownTree = ({
   const commit = (next: MarkdownTreeNode[]) => {
     if (!isControlled) setInternal(next);
     onChange?.(next);
+  };
+
+  const switchMode = (next: MarkdownTreeMode) => {
+    if (next === mode) return;
+    if (next === 'markdown') {
+      // Tree -> Markdown: seed the editor from the current tree.
+      setMarkdownDraft(treeToMarkdown(tree));
+    } else {
+      // Markdown -> Tree: make sure the tree reflects the latest text.
+      commit(markdownToTree(markdownDraft, tree));
+    }
+    setMode(next);
+    onModeChange?.(next);
+  };
+
+  // Markdown -> Tree: parse on every keystroke so the tree (the source of
+  // truth) stays in sync and is ready the instant the user switches back.
+  const handleMarkdownChange = (next: string) => {
+    setMarkdownDraft(next);
+    commit(markdownToTree(next, tree));
   };
 
   const handleAddRoot = () => {
@@ -182,12 +222,57 @@ export const MarkdownTree = ({
   return (
     <div className={['rcl-md-tree', className].filter(Boolean).join(' ')}>
       <div className="rcl-md-tree__toolbar">
-        <button type="button" onClick={handleAddRoot}>
-          + Add root node
-        </button>
+        {enableMarkdownMode && (
+          <div
+            className="rcl-md-tree__modes"
+            role="tablist"
+            aria-label="Editing mode"
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'tree'}
+              className={[
+                'rcl-md-tree__mode',
+                mode === 'tree' ? 'rcl-md-tree__mode--active' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              onClick={() => switchMode('tree')}
+            >
+              Tree
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'markdown'}
+              className={[
+                'rcl-md-tree__mode',
+                mode === 'markdown' ? 'rcl-md-tree__mode--active' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              onClick={() => switchMode('markdown')}
+            >
+              Markdown
+            </button>
+          </div>
+        )}
+
+        {mode === 'tree' && (
+          <button type="button" onClick={handleAddRoot}>
+            + Add root node
+          </button>
+        )}
       </div>
 
-      {flattened.length === 0 ? (
+      {mode === 'markdown' ? (
+        <MarkdownEditor
+          value={markdownDraft}
+          onChange={handleMarkdownChange}
+          readOnly={!editable}
+        />
+      ) : flattened.length === 0 ? (
         <p className="rcl-md-tree__empty">
           No nodes yet. Click <strong>+ Add root node</strong> to start.
         </p>

@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ChatWorkspace,
+  type ChatReply,
   type MarkdownTreeNodeData,
 } from 'ai-mindmap-generator-sample';
 import questionReply from '../src/question.json';
+import { generateMindmap } from './api';
 
 const initialTree = questionReply.attachment.tree as MarkdownTreeNodeData[];
 
@@ -75,6 +77,18 @@ export const App = () => {
       attachment: { type: 'mindmap', tree: nextTree },
     });
   };
+
+  // Chat responder: send the typed message to the backend and return the
+  // generated Markdown as the assistant reply. ChatDialog renders the returned
+  // `content` as a response bubble in the ChatInputPanel (and surfaces a thrown
+  // error there too, so a down backend shows up as a ⚠️ message).
+  const handleChatSubmit = useCallback(
+    async (input: string): Promise<ChatReply> => {
+      const markdown = await generateMindmap(input);
+      return { content: markdown };
+    },
+    [],
+  );
 
   // Close the dialog on Escape and lock background scroll while it's open.
   useEffect(() => {
@@ -279,6 +293,7 @@ export const App = () => {
               <ChatWorkspace
                 value={tree}
                 onChange={setTree}
+                onChatSubmit={handleChatSubmit}
                 mindMapJson={mindMapJson}
                 className="rcl-chat-workspace--fill"
               />

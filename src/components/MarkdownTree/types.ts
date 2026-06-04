@@ -5,6 +5,9 @@ export interface MarkdownTreeNode {
   children?: MarkdownTreeNode[];
 }
 
+/** Editing surfaces the component can present. */
+export type MarkdownTreeMode = 'tree' | 'markdown';
+
 export interface MarkdownTreeProps {
   /** Controlled tree value. When provided, the component is controlled. */
   value?: MarkdownTreeNode[];
@@ -18,4 +21,13 @@ export interface MarkdownTreeProps {
   editable?: boolean;
   /** Extra class name for the wrapper. */
   className?: string;
+  /**
+   * Expose the "Markdown Input Mode" toggle so users can author the tree as
+   * raw Markdown text. Defaults to true.
+   */
+  enableMarkdownMode?: boolean;
+  /** Which surface to show first. Defaults to 'tree'. */
+  defaultMode?: MarkdownTreeMode;
+  /** Notified whenever the user switches between tree and markdown modes. */
+  onModeChange?: (mode: MarkdownTreeMode) => void;
 }

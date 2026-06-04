@@ -1,78 +1,62 @@
-# chat-backend
+# AI Mind-Map Generator — Backend
 
-A small FastAPI service that returns JSON-only structured replies (matching the
-frontend `MarkdownTreeNode[]` schema in `src/questions.json`) for the React
-`ChatDialog` component.
+A tiny, **stateless** AI service. Send a question, get back a Markdown mind map
+(main topic → subtopics → bullet points). No database, no sessions.
 
-The agent layer is pluggable: the current implementation is a deterministic
-rule-based agent that returns the seed tree, but it can be swapped for an LLM
-(OpenAI, Azure OpenAI, etc.) without touching the route.
+## Structure
 
-## Quickstart
-
-Prerequisites: Python 3.11+ and [uv](https://docs.astral.sh/uv/).
-
-```bash
-cd backend
-uv sync
-cp .env.example .env
-
-uv run uvicorn app.main:app --reload --port 8000
+```
+backend/
+├── app/
+│   ├── ai/
+│   │   └── mindmap.py     # core AI logic: generate_mindmap(question) -> markdown
+│   ├── routes/
+│   │   └── generate.py    # POST /generate
+│   └── main.py            # FastAPI entry point
+├── requirements.txt
+└── .env                   # AI provider config
 ```
 
-- Swagger UI: <http://localhost:8000/docs>
-- Health check: <http://localhost:8000/health>
-
-### Smoke test
+## Setup
 
 ```bash
-curl -X POST http://localhost:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{"input":"hi"}'
+python -m venv .venv
+.venv\Scripts\activate        # Windows
+# source .venv/bin/activate   # macOS/Linux
+pip install -r requirements.txt
 ```
 
-Expected response shape:
+Configure the AI provider in `.env` (see `.env.example`):
+
+- `AI_PROVIDER=ollama` — local Ollama model (default, free). Needs Ollama running
+  with the model pulled: `ollama pull llama3`.
+- `AI_PROVIDER=claude` — Anthropic Claude API. Set `ANTHROPIC_API_KEY`.
+- `AI_PROVIDER=mock` — no AI, returns a templated mind map (handy for offline UI work).
+
+## Run
+
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+
+## API
+
+### `POST /generate`
+
+Request:
 
 ```json
-{
-  "content": "Here is the recommended questions list.",
-  "attachment": {
-    "type": "mindmap",
-    "tree": [{ "id": "root", "content": "# Questions\n...", "children": [...] }]
-  }
-}
+{ "question": "How does photosynthesis work?" }
 ```
 
-### Tests
+Response:
 
-```bash
-uv run pytest
+```json
+{ "markdown": "# Photosynthesis\n\n## Inputs\n- Sunlight\n- Water\n..." }
 ```
 
-## Swapping in an LLM
+### `GET /health`
 
-1. Implement `LLMAgent.respond` in `app/agents/llm.py` using your provider SDK.
-2. Set `AGENT_BACKEND=openai` (and `OPENAI_API_KEY` / `OPENAI_MODEL`) in `.env`.
-3. Restart the server — the route is unchanged.
-
-## Layout
-
-```
-app/
-  main.py             FastAPI app, CORS, router mount
-  config.py           pydantic-settings (reads .env)
-  logging_config.py   stdlib dictConfig
-  schemas.py          TreeNode, ChatRequest, ChatReply, MindMapAttachment
-  deps.py             agent factory injected via Depends
-  routers/
-    chat.py           POST /chat
-    health.py         GET /health
-  agents/
-    base.py           ChatAgent Protocol
-    rule_based.py     deterministic, loads data/questions.json
-    llm.py            placeholder for OpenAI / Azure OpenAI
-  data/
-    questions.json    seed tree
-tests/
-  test_chat.py
+```json
+{ "status": "healthy" }
 ```

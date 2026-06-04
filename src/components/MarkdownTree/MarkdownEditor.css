@@ -1,0 +1,32 @@
+.rcl-md-editor {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.rcl-md-editor__textarea {
+  width: 100%;
+  min-height: 240px;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  padding: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #111827;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  resize: vertical;
+  tab-size: 2;
+}
+
+.rcl-md-editor__textarea:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+  border-color: #2563eb;
+}
+
+.rcl-md-editor__textarea::placeholder {
+  color: #9ca3af;
+}
