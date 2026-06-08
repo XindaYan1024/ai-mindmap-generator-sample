@@ -23,9 +23,12 @@ const LEAF_GAP_MULTIPLIER = 1.5;
  * vertically over the span of its children, producing a classic hierarchical
  * tree that expands rightward from the root.
  *
- * Returns the same `Map<id, {x, y}>` contract as before — positions are the
- * node's top-left corner. Because all nodes share one height, centering the
- * top-left over the children's span also centers the node over them.
+ * When the root has more than 4 direct children, the layout switches to a
+ * balanced left-right mode: the first N/2 children go left, the rest go right.
+ * Both halves are laid out independently and then vertically centered against
+ * each other so the root sits in the middle.
+ *
+ * Returns `Map<id, {x, y, side}>`. `side` is set only in the balanced layout.
  */
 export const layoutTree = (
   tree: MarkdownTreeNode[],
@@ -33,8 +36,58 @@ export const layoutTree = (
   const positions = new Map<string, LayoutPosition>();
   const yCursor = { value: 0 };
 
-  // Place `node` and its subtree, returning the node's y so the parent can
-  // center itself over its children. x is fixed by depth → shared per level.
+  // ── helpers used only by the balanced layout ─────────────────────────────
+
+  // Place `node` and its subtree expanding in `side` direction. Nodes at depth
+  // d have their edge closest to the root at ±d*(NODE_WIDTH+LEVEL_GAP_X).
+  // For left-side leaves the extra width is absorbed leftward so the right edge
+  // stays flush with the non-leaf boundary.
+  const placeDirectional = (
+    node: MarkdownTreeNode,
+    depth: number,
+    side: 'left' | 'right',
+    cursor: { value: number },
+    out: Map<string, LayoutPosition>,
+  ): number => {
+    const children = node.children ?? [];
+    const nodeWidth = children.length === 0 ? LEAF_NODE_WIDTH : NODE_WIDTH;
+    const step = depth * (NODE_WIDTH + LEVEL_GAP_X);
+    // For right side: left edge at +step.
+    // For left side: right edge at -step, so left edge = -step - nodeWidth.
+    //   Non-leaf extra = 0; leaf extra = LEAF_NODE_WIDTH - NODE_WIDTH = NODE_WIDTH.
+    const x =
+      side === 'right'
+        ? step
+        : -step - (nodeWidth - NODE_WIDTH); // simplifies to -step for non-leaf
+
+    if (children.length === 0) {
+      const y = cursor.value;
+      out.set(node.id, { x, y, side });
+      cursor.value += NODE_HEIGHT + GAP_Y * LEAF_GAP_MULTIPLIER;
+      return y;
+    }
+
+    const childYs = children.map((c) =>
+      placeDirectional(c, depth + 1, side, cursor, out),
+    );
+    const y = (childYs[0]! + childYs[childYs.length - 1]!) / 2;
+    out.set(node.id, { x, y, side });
+    return y;
+  };
+
+  // Shift every node in `node`'s subtree vertically by `dy`.
+  const shiftSubtreeY = (
+    node: MarkdownTreeNode,
+    dy: number,
+    map: Map<string, LayoutPosition>,
+  ) => {
+    const pos = map.get(node.id);
+    if (pos) map.set(node.id, { ...pos, y: pos.y + dy });
+    for (const child of node.children ?? []) shiftSubtreeY(child, dy, map);
+  };
+
+  // ── original single-direction (right-only) layout ────────────────────────
+
   const place = (node: MarkdownTreeNode, depth: number): number => {
     const children = node.children ?? [];
     const x = depth * (NODE_WIDTH + LEVEL_GAP_X);
@@ -42,7 +95,6 @@ export const layoutTree = (
     if (children.length === 0) {
       const y = yCursor.value;
       positions.set(node.id, { x, y });
-      // Leaf-only: widen the vertical gap between consecutive leaf rows.
       yCursor.value += NODE_HEIGHT + GAP_Y * LEAF_GAP_MULTIPLIER;
       return y;
     }
@@ -53,10 +105,58 @@ export const layoutTree = (
     return y;
   };
 
+  // ── main loop ─────────────────────────────────────────────────────────────
+
   for (const root of tree) {
-    place(root, 0);
-    // Extra gap so independent root subtrees don't touch.
-    yCursor.value += GAP_Y;
+    const children = root.children ?? [];
+    const N = children.length;
+
+    if (N >= 2) {
+      // Balanced left-right layout: applies whenever there are 2+ root-level
+      // children, ensuring the root stays centred regardless of topic count.
+      // (The previous N>4 threshold left the root at the left edge for smaller
+      // backend responses, making the layout inconsistent with JSON input.)
+      const leftCount = Math.floor(N / 2);
+      const leftChildren = children.slice(0, leftCount);
+      const rightChildren = children.slice(leftCount);
+
+      // Layout each half independently starting from y=0.
+      const rightMap = new Map<string, LayoutPosition>();
+      const rightCursor = { value: 0 };
+      const rightYs = rightChildren.map((c) =>
+        placeDirectional(c, 1, 'right', rightCursor, rightMap),
+      );
+
+      const leftMap = new Map<string, LayoutPosition>();
+      const leftCursor = { value: 0 };
+      leftChildren.forEach((c) =>
+        placeDirectional(c, 1, 'left', leftCursor, leftMap),
+      );
+
+      const rightH = rightCursor.value;
+      const leftH = leftCursor.value;
+      const totalH = Math.max(rightH, leftH);
+
+      // Shift each half so it is vertically centered within totalH, then
+      // offset both by the global yCursor so roots stack correctly.
+      const rightDy = yCursor.value + (totalH - rightH) / 2;
+      const leftDy = yCursor.value + (totalH - leftH) / 2;
+      for (const c of rightChildren) shiftSubtreeY(c, rightDy, rightMap);
+      for (const c of leftChildren) shiftSubtreeY(c, leftDy, leftMap);
+
+      for (const [id, pos] of rightMap) positions.set(id, pos);
+      for (const [id, pos] of leftMap) positions.set(id, pos);
+
+      // Root y = center of the right half (both halves share the same center).
+      const rootY =
+        (rightYs[0]! + rightYs[rightYs.length - 1]!) / 2 + rightDy;
+      positions.set(root.id, { x: 0, y: rootY, side: 'root' });
+
+      yCursor.value += totalH + GAP_Y;
+    } else {
+      place(root, 0);
+      yCursor.value += GAP_Y;
+    }
   }
 
   return positions;

@@ -21,4 +21,6 @@ export interface MindMapProps {
 export interface LayoutPosition {
   x: number;
   y: number;
+  /** Which side of the root this node sits on. Undefined means single-direction layout. */
+  side?: 'left' | 'right' | 'root';
 }

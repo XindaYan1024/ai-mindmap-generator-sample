@@ -18,6 +18,8 @@ export interface MindMapNodeData {
   isDropTarget: boolean;
   /** Delay (ms) before this node's enter animation starts — staggers by level. */
   appearDelay?: number;
+  /** Layout side: 'left' mirrors handles; 'root' adds dual source handles. */
+  side?: 'left' | 'right' | 'root';
   onAddChild: (id: string) => void;
   onDelete: (id: string) => void;
   onUpdate: (id: string, content: string) => void;
@@ -33,8 +35,12 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
     hasChildren,
     isDropTarget,
     appearDelay,
+    side,
     onUpdate,
   } = data as MindMapNodeData;
+
+  const isLeft = side === 'left';
+  const isRoot = side === 'root';
 
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(content);
@@ -88,7 +94,7 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
       {hasParent && (
         <Handle
           type="target"
-          position={Position.Left}
+          position={isLeft ? Position.Right : Position.Left}
           className="rcl-mind-map__handle"
         />
       )}
@@ -114,17 +120,34 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
         )}
       </div>
 
-      {hasChildren && (
+      {/* Root in balanced layout: one source handle per side with explicit IDs. */}
+      {isRoot && (
+        <>
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="source-right"
+            className="rcl-mind-map__handle"
+          />
+          <Handle
+            type="source"
+            position={Position.Left}
+            id="source-left"
+            className="rcl-mind-map__handle"
+          />
+        </>
+      )}
+      {!isRoot && hasChildren && (
         <Handle
           type="source"
-          position={Position.Right}
+          position={isLeft ? Position.Left : Position.Right}
           className="rcl-mind-map__handle"
         />
       )}
-      {!hasChildren && (
+      {!isRoot && !hasChildren && (
         <Handle
           type="source"
-          position={Position.Right}
+          position={isLeft ? Position.Left : Position.Right}
           className="rcl-mind-map__handle rcl-mind-map__handle--hidden"
         />
       )}

@@ -205,6 +205,7 @@ const MindMapInner = ({
             hasChildren,
             isDropTarget: dropTargetId === item.id,
             appearDelay: (depthById.get(item.id) ?? 0) * LEVEL_APPEAR_DELAY,
+            side: autoPositions.get(item.id)?.side,
             onAddChild: (id: string) => handlersRef.current.handleAddChild(id),
             onDelete: (id: string) => handlersRef.current.handleDelete(id),
             onUpdate: (id: string, c: string) =>
@@ -226,13 +227,22 @@ const MindMapInner = ({
 
   const edges: Edge[] = useMemo(
     () =>
-      collectEdges(tree).map(({ source, target }) => ({
-        id: `${source}->${target}`,
-        source,
-        target,
-        type: 'smoothstep',
-      })),
-    [tree],
+      collectEdges(tree).map(({ source, target }) => {
+        const sourceSide = autoPositions.get(source)?.side;
+        const isRootSource = sourceSide === 'root';
+        const isLeftTarget = autoPositions.get(target)?.side === 'left';
+        return {
+          id: `${source}->${target}`,
+          source,
+          target,
+          type: 'smoothstep',
+          // Root in balanced layout has two source handles; pick the correct one.
+          ...(isRootSource
+            ? { sourceHandle: isLeftTarget ? 'source-left' : 'source-right' }
+            : {}),
+        };
+      }),
+    [tree, autoPositions],
   );
 
   const onNodesChange = useCallback(
