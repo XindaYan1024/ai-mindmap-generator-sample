@@ -7,6 +7,7 @@ import {
 import { convertToMindMap, type MindMapInput } from '../src/components/ChatWorkspace/json2MindMap';
 import questionReply from '../src/question.json';
 import { generateMindmap } from './api';
+import { MarkdownTreeNode } from '../src/components/MarkdownTree/types';
 
 const initialTree = questionReply.attachment.tree as MarkdownTreeNodeData[];
 
@@ -90,7 +91,21 @@ export const App = () => {
   const handleChatSubmit = useCallback(
     async (input: string): Promise<ChatReply> => {
       const data = await generateMindmap(input);
-      return { content: data.markdown };
+      console.log("yanx2");
+      console.log(data);
+
+      const result = convertToMindMap(
+        data.jsonValue, // { topics: [...] }
+        "Summary", // root node heading (default: "Mind Map")
+        "A summary of your questions", // root node subtext (optional)
+        "Here is the mind map.", // top-level `content` field (optional)
+      );
+      console.log(result);
+      setTree(result.attachment.tree as MarkdownTreeNode[]);
+      return {
+        content: data.markdown,
+        attachment: result.attachment as { type: "mindmap"; tree: MarkdownTreeNode[] },
+      };
     },
     [],
   );

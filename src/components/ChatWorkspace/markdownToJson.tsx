@@ -1,4 +1,4 @@
-import type { MarkdownTreeNode } from '../src/components/MarkdownTree/types';
+import type { MarkdownTreeNode } from '../MarkdownTree/types';
 
 // Convert a mind-map Markdown string into the question.json-shaped tree JSON.
 //
@@ -139,9 +139,9 @@ export function markdownToMindmapData(markdown: string): MindmapData {
   const root = tree[0];
   const sections = root?.children ?? [];
 
-  const topics: Topic[] = sections.map((section) => ({
+  const topics: Topic[] = sections.map((section: MarkdownTreeNode) => ({
     title: cleanTitle(section.content),
-    subtopics: (section.children ?? []).map((point) => ({
+    subtopics: (section.children ?? []).map((point: MarkdownTreeNode) => ({
       title: cleanTitle(point.content),
       description: point.children?.[0]
         ? cleanTitle(point.children[0].content)

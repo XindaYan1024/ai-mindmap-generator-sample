@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 // Thin client for the mind-map backend (backend/app/routes/generate.py).
 // Override the base URL with a VITE_API_BASE env var; defaults to localhost:8000.
 const API_BASE =

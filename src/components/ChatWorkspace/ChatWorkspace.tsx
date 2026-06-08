@@ -27,10 +27,9 @@ const DEFAULT_LABELS = {
  * others immediately.
  */
 export const ChatWorkspace = ({
-  value,
   defaultValue,
   onChange,
-  // onChatSubmit,
+  onChatSubmit,
   mindMapJson,
   showMindMap = true,
   showMarkdownTree = true,
@@ -40,31 +39,30 @@ export const ChatWorkspace = ({
   chatHeight = 560,
   chatAttachmentHeight = 360,
   className,
-  jsonValue,
-  jsonOnChange,
+  jsonValue
 }: ChatWorkspaceProps) => {
 
-  const handleChatSubmit = useCallback(
-    async (input: string): Promise<ChatReply> => {
-      const data = await generateMindmap(input);
-      console.log("yanx2");
-      console.log(data);
+  // const handleChatSubmit = useCallback(
+  //   async (input: string): Promise<ChatReply> => {
+  //     const data = await generateMindmap(input);
+  //     console.log("yanx2");
+  //     console.log(data);
 
-      const result = convertToMindMap(
-        data.jsonValue, // { topics: [...] }
-        "Summary", // root node heading (default: "Mind Map")
-        "A summary of your questions", // root node subtext (optional)
-        "Here is the mind map.", // top-level `content` field (optional)
-      );
-      console.log(result);
-      setTree(result.attachment.tree as MarkdownTreeNode[]);
-      return {
-        content: data.markdown,
-        attachment: result.attachment as { type: "mindmap"; tree: MarkdownTreeNode[] },
-      };
-    },
-    [],
-  );
+  //     const result = convertToMindMap(
+  //       data.jsonValue, // { topics: [...] }
+  //       "Summary", // root node heading (default: "Mind Map")
+  //       "A summary of your questions", // root node subtext (optional)
+  //       "Here is the mind map.", // top-level `content` field (optional)
+  //     );
+  //     console.log(result);
+  //     setTree(result.attachment.tree as MarkdownTreeNode[]);
+  //     return {
+  //       content: data.markdown,
+  //       attachment: result.attachment as { type: "mindmap"; tree: MarkdownTreeNode[] },
+  //     };
+  //   },
+  //   [],
+  // );
 
   const formattedJson = jsonValue && convertToMindMap(
         jsonValue, 
@@ -96,7 +94,7 @@ export const ChatWorkspace = ({
     [mindMapJson],
   );
 
-  const chatSubmit = handleChatSubmit ?? localSubmit;
+  const chatSubmit = onChatSubmit ?? localSubmit;
 
   const chatDefaultMessages = useMemo<ChatMessage[] | undefined>(() => {
     if (!formattedJson) return undefined;
