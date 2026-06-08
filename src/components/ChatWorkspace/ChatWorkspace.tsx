@@ -1,21 +1,23 @@
-import { useCallback, useState } from 'react';
-import { MindMap } from '../MindMap';
-import { MarkdownTree } from '../MarkdownTree';
-import { ChatDialog } from '../ChatDialog';
-import type { MarkdownTreeNode } from '../MarkdownTree/types';
-import type { ChatReply } from '../ChatDialog/types';
-import type { ChatWorkspaceProps } from './types';
-import questionReply from '../../question.json';
-import './ChatWorkspace.css';
+import { useCallback, useState } from "react";
+import { MindMap } from "../MindMap";
+import { MarkdownTree } from "../MarkdownTree";
+import { ChatDialog } from "../ChatDialog";
+import type { MarkdownTreeNode } from "../MarkdownTree/types";
+import type { ChatReply } from "../ChatDialog/types";
+import type { ChatWorkspaceProps } from "./types";
+import questionReply from "../../question.json";
+import "./ChatWorkspace.css";
+import { generateMindmap } from "./api";
+import { convertToMindMap } from "./json2MindMap";
 
 // Static reply loaded in place of a backend call. Its structure matches the
 // `ChatReply` the backend used to return: text plus a MindMap attachment.
 const localReply = questionReply as ChatReply;
 
 const DEFAULT_LABELS = {
-  mindMap: 'MindMap',
-  markdownTree: 'MarkdownTree',
-  chat: 'ChatDialog',
+  mindMap: "MindMap",
+  markdownTree: "MarkdownTree",
+  chat: "ChatDialog",
 };
 
 /**
@@ -28,7 +30,7 @@ export const ChatWorkspace = ({
   value,
   defaultValue,
   onChange,
-  onChatSubmit,
+  // onChatSubmit,
   mindMapJson,
   showMindMap = true,
   showMarkdownTree = true,
@@ -38,7 +40,32 @@ export const ChatWorkspace = ({
   chatHeight = 560,
   chatAttachmentHeight = 360,
   className,
+  jsonValue,
+  jsonOnChange,
 }: ChatWorkspaceProps) => {
+
+  const handleChatSubmit = useCallback(
+    async (input: string): Promise<ChatReply> => {
+      const data = await generateMindmap(input);
+      console.log("yanx2");
+      console.log(data);
+
+      const result = convertToMindMap(
+        data.jsonValue, // { topics: [...] }
+        "Summary", // root node heading (default: "Mind Map")
+        "A summary of your questions", // root node subtext (optional)
+        "Here is the mind map.", // top-level `content` field (optional)
+      );
+      console.log(result);
+      setTree(result.attachment.tree as MarkdownTreeNode[]);
+      return {
+        content: data.markdown,
+        attachment: result.attachment as { type: "mindmap"; tree: MarkdownTreeNode[] },
+      };
+    },
+    [],
+  );
+
   const isControlled = value !== undefined;
   const [internal, setInternal] = useState<MarkdownTreeNode[]>(
     defaultValue ?? [],
@@ -61,13 +88,14 @@ export const ChatWorkspace = ({
     [mindMapJson],
   );
 
-  const chatSubmit = onChatSubmit ?? localSubmit;
+  const chatSubmit = handleChatSubmit ?? localSubmit;
 
-  const resolvedLabels = labels === false ? null : { ...DEFAULT_LABELS, ...labels };
+  const resolvedLabels =
+    labels === false ? null : { ...DEFAULT_LABELS, ...labels };
 
   return (
     <div
-      className={['rcl-chat-workspace', className].filter(Boolean).join(' ')}
+      className={["rcl-chat-workspace", className].filter(Boolean).join(" ")}
     >
       {showMindMap && (
         <section className="rcl-chat-workspace__section">

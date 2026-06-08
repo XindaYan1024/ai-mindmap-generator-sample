@@ -58,8 +58,9 @@ SYSTEM_PROMPT = """You are a mind-map generator. Given a topic or question, you 
 - Use exactly ONE H1 (`# `) line: the main topic. It must be the first line.
 - Use H2 (`## `) lines for subtopics. Provide 3-6 subtopics.
 - Under each subtopic, use `- ` bullet points for supporting points. Provide 2-5 bullets each.
-- Keep every line short (a few words to one sentence). No paragraphs.
-- Do not nest deeper than one level of bullets.
+- Under each supporting point, add EXACTLY ONE nested bullet, indented by two spaces, containing a single complete sentence that describes or explains that point.
+- Keep the H1, H2, and supporting-point lines short (a few words). Only the nested description line is a full sentence. No paragraphs.
+- Do not nest deeper than the description level (two levels of bullets total).
 - Stay factual and on-topic. If the input is a question, the H1 is the core subject of that question.
 
 ## FORMAT (follow exactly)
@@ -67,11 +68,15 @@ SYSTEM_PROMPT = """You are a mind-map generator. Given a topic or question, you 
 
 ## Subtopic 1
 - Point A
+  - A single sentence describing Point A.
 - Point B
+  - A single sentence describing Point B.
 
 ## Subtopic 2
 - Point A
+  - A single sentence describing Point A.
 - Point B
+  - A single sentence describing Point B.
 
 Output only the Markdown mind map.
 """
@@ -139,14 +144,21 @@ def _generate_mock(question: str) -> str:
         f"# {topic}\n\n"
         f"## Overview\n"
         f"- What {topic} is\n"
-        f"- Why it matters\n\n"
+        f"  - This describes the core idea behind {topic}.\n"
+        f"- Why it matters\n"
+        f"  - This explains why {topic} is significant in practice.\n\n"
         f"## Key Aspects\n"
         f"- First aspect\n"
+        f"  - This covers the first important aspect of {topic}.\n"
         f"- Second aspect\n"
-        f"- Third aspect\n\n"
+        f"  - This covers the second important aspect of {topic}.\n"
+        f"- Third aspect\n"
+        f"  - This covers the third important aspect of {topic}.\n\n"
         f"## Considerations\n"
         f"- Common challenges\n"
+        f"  - This outlines the common challenges associated with {topic}.\n"
         f"- Best practices\n"
+        f"  - This summarizes the recommended best practices for {topic}.\n"
     )
 
 

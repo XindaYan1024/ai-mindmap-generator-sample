@@ -84,8 +84,8 @@ export const App = () => {
   // error there too, so a down backend shows up as a ⚠️ message).
   const handleChatSubmit = useCallback(
     async (input: string): Promise<ChatReply> => {
-      const markdown = await generateMindmap(input);
-      return { content: markdown };
+      const data = await generateMindmap(input);
+      return { content: data.markdown };
     },
     [],
   );
@@ -104,6 +104,8 @@ export const App = () => {
       document.body.style.overflow = prevOverflow;
     };
   }, [showDemo]);
+
+  const [jsonValue, setJsonValue] = useState<MarkdownTreeNodeData[] | null>(null);
 
   return (
     <div
@@ -293,6 +295,8 @@ export const App = () => {
               <ChatWorkspace
                 value={tree}
                 onChange={setTree}
+                jsonValue={jsonValue}
+                jsonOnChange={setJsonValue}
                 onChatSubmit={handleChatSubmit}
                 mindMapJson={mindMapJson}
                 className="rcl-chat-workspace--fill"

@@ -50,4 +50,6 @@ export interface ChatWorkspaceProps {
 
   /** Extra class name for the wrapper. */
   className?: string;
+  jsonValue?: any;
+  jsonOnChange?: (next: any) => void;
 }
