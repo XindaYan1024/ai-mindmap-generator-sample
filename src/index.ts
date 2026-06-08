@@ -27,3 +27,6 @@ export type {
 
 export { ChatWorkspace } from './components/ChatWorkspace';
 export type { ChatWorkspaceProps } from './components/ChatWorkspace';
+
+export { convertToMindMap } from './components/ChatWorkspace/json2MindMap';
+export type { MindMapInput, MindMapOutput } from './components/ChatWorkspace/json2MindMap';

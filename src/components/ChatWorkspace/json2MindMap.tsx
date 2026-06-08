@@ -8,7 +8,7 @@ interface Topic {
   subtopics: Subtopic[];
 }
 
-interface MindMapInput {
+export interface MindMapInput {
   topics: Topic[];
 }
 
@@ -18,7 +18,7 @@ interface MindMapNode {
   children?: MindMapNode[];
 }
 
-interface MindMapOutput {
+export interface MindMapOutput {
   content: string;
   attachment: {
     type: "mindmap";

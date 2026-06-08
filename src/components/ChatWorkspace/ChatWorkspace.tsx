@@ -1,9 +1,9 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { MindMap } from "../MindMap";
 import { MarkdownTree } from "../MarkdownTree";
 import { ChatDialog } from "../ChatDialog";
 import type { MarkdownTreeNode } from "../MarkdownTree/types";
-import type { ChatReply } from "../ChatDialog/types";
+import type { ChatMessage, ChatReply } from "../ChatDialog/types";
 import type { ChatWorkspaceProps } from "./types";
 import questionReply from "../../question.json";
 import "./ChatWorkspace.css";
@@ -66,16 +66,24 @@ export const ChatWorkspace = ({
     [],
   );
 
-  const isControlled = value !== undefined;
+  const formattedJson = jsonValue && convertToMindMap(
+        jsonValue, 
+        "Summary", 
+        "A summary of your questions", 
+        "Here is the mind map.",
+      );
+
+  const isControlled = formattedJson ;
   const [internal, setInternal] = useState<MarkdownTreeNode[]>(
     defaultValue ?? [],
   );
-  const tree = isControlled ? (value as MarkdownTreeNode[]) : internal;
+  const tree = isControlled ? (formattedJson.attachment?.tree as MarkdownTreeNode[]) : internal;
 
   const setTree = useCallback(
     (next: MarkdownTreeNode[]) => {
       if (!isControlled) setInternal(next);
       onChange?.(next);
+      // jsonOnChange();
     },
     [isControlled, onChange],
   );
@@ -89,6 +97,19 @@ export const ChatWorkspace = ({
   );
 
   const chatSubmit = handleChatSubmit ?? localSubmit;
+
+  const chatDefaultMessages = useMemo<ChatMessage[] | undefined>(() => {
+    if (!formattedJson) return undefined;
+    return [
+      {
+        id: "init-mindmap",
+        role: "assistant",
+        content: formattedJson.content,
+        attachment: formattedJson.attachment as { type: "mindmap"; tree: MarkdownTreeNode[] },
+        createdAt: 0,
+      },
+    ];
+  }, [formattedJson]);
 
   const resolvedLabels =
     labels === false ? null : { ...DEFAULT_LABELS, ...labels };
@@ -121,6 +142,7 @@ export const ChatWorkspace = ({
             onMindMapChange={setTree}
             defaultMindMapTree={tree}
             onSubmit={chatSubmit}
+            defaultValue={chatDefaultMessages}
           />
         </section>
       )}

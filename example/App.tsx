@@ -4,24 +4,32 @@ import {
   type ChatReply,
   type MarkdownTreeNodeData,
 } from 'ai-mindmap-generator-sample';
+import { convertToMindMap, type MindMapInput } from '../src/components/ChatWorkspace/json2MindMap';
 import questionReply from '../src/question.json';
 import { generateMindmap } from './api';
 
 const initialTree = questionReply.attachment.tree as MarkdownTreeNodeData[];
 
-// Shape of the JSON a user can paste: same as the bundled `question.json`
-// (a backend `ChatReply` with an optional MindMap attachment), or a bare tree
-// array. Used only to derive props passed to <ChatWorkspace>; no component
-// internals are touched.
 type PastedReply = {
   content?: string;
   attachment?: { type: 'mindmap'; tree: MarkdownTreeNodeData[] };
 };
 
-// Pull the tree out of a pasted object, accepting either the full ChatReply
-// shape ({ attachment: { tree } }) or a bare tree array.
+// Pull the tree out of a pasted object, accepting:
+//   1. { topics: [...] }  — mockedAPI.json format, converted via convertToMindMap
+//   2. { attachment: { tree } } — full ChatReply / question.json format
+//   3. A bare tree array
 const extractTree = (parsed: unknown): MarkdownTreeNodeData[] | null => {
   if (Array.isArray(parsed)) return parsed as MarkdownTreeNodeData[];
+  if (
+    parsed !== null &&
+    typeof parsed === 'object' &&
+    'topics' in parsed &&
+    Array.isArray((parsed as MindMapInput).topics)
+  ) {
+    const result = convertToMindMap(parsed as MindMapInput);
+    return result.attachment.tree as MarkdownTreeNodeData[];
+  }
   const tree = (parsed as PastedReply)?.attachment?.tree;
   return Array.isArray(tree) ? tree : null;
 };
@@ -29,7 +37,7 @@ const extractTree = (parsed: unknown): MarkdownTreeNodeData[] | null => {
 export const App = () => {
   const [tree, setTree] = useState<MarkdownTreeNodeData[]>(initialTree);
   const [showDemo, setShowDemo] = useState(false);
-
+  const [jsonValue, setJsonValue] = useState<any>(null);
   // JSON-paste wiring (additive only — falls back to defaults when empty).
   const [jsonText, setJsonText] = useState('');
   const [jsonError, setJsonError] = useState<string | null>(null);
@@ -47,35 +55,32 @@ export const App = () => {
     const text = jsonText.trim();
     if (!text) {
       setJsonError(null);
-      setTree(initialTree);
+      // setTree(initialTree);
       setMindMapJson(undefined);
       return;
     }
     let parsed: unknown;
     try {
       parsed = JSON.parse(text);
+      setJsonValue(parsed);
     } catch {
       setJsonError('Invalid JSON format');
       return;
     }
-    const nextTree = extractTree(parsed);
-    if (!nextTree) {
-      setJsonError(
-        'JSON parsed, but no tree found (expected an array or { attachment: { tree } }).',
-      );
-      return;
-    }
-    setJsonError(null);
-    setTree(nextTree);
-    const content = (parsed as PastedReply).content;
-    console.log('yanx2', {
-      content: typeof content === 'string' ? content : '',
-      attachment: { type: 'mindmap', tree: nextTree },
-    })
-    setMindMapJson({
-      content: typeof content === 'string' ? content : '',
-      attachment: { type: 'mindmap', tree: nextTree },
-    });
+    // const nextTree = extractTree(parsed);
+    // if (!nextTree) {
+    //   setJsonError(
+    //     'JSON parsed, but no valid structure found. Expected { topics: [...] }, { attachment: { tree: [...] } }, or a bare array.',
+    //   );
+    //   return;
+    // }
+    // setJsonError(null);
+    // setTree(nextTree);
+    // const content = (parsed as PastedReply).content;
+    // setMindMapJson({
+    //   content: typeof content === 'string' ? content : '',
+    //   attachment: { type: 'mindmap', tree: nextTree },
+    // });
   };
 
   // Chat responder: send the typed message to the backend and return the
@@ -104,8 +109,6 @@ export const App = () => {
       document.body.style.overflow = prevOverflow;
     };
   }, [showDemo]);
-
-  const [jsonValue, setJsonValue] = useState<MarkdownTreeNodeData[] | null>(null);
 
   return (
     <div
@@ -153,7 +156,7 @@ export const App = () => {
               }
             }
           }}
-          placeholder='Paste a JSON object, e.g. { "content": "...", "attachment": { "type": "mindmap", "tree": [ ... ] } }'
+          placeholder='Paste a JSON object, e.g. { "topics": [ { "title": "...", "subtopics": [ { "title": "...", "description": "..." } ] } ] }'
           rows={6}
           style={{
             width: '100%',
@@ -293,7 +296,7 @@ export const App = () => {
 
             <div style={{ flex: '1 1 auto', minHeight: 0, overflow: 'auto', padding: 24 }}>
               <ChatWorkspace
-                value={tree}
+                // value={tree}
                 onChange={setTree}
                 jsonValue={jsonValue}
                 jsonOnChange={setJsonValue}
