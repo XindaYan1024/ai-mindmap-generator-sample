@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { MindMap } from "../MindMap";
 import { MarkdownTree } from "../MarkdownTree";
 import { ChatDialog } from "../ChatDialog";
@@ -7,11 +7,8 @@ import type { ChatMessage, ChatReply } from "../ChatDialog/types";
 import type { ChatWorkspaceProps } from "./types";
 import questionReply from "../../question.json";
 import "./ChatWorkspace.css";
-// import { generateMindmap } from "./api";
-import { convertToMindMap } from "./json2MindMap";
+import { convertToMindMap, convertFromMindMap } from "./json2MindMap";
 
-// Static reply loaded in place of a backend call. Its structure matches the
-// `ChatReply` the backend used to return: text plus a MindMap attachment.
 const localReply = questionReply as ChatReply;
 
 const DEFAULT_LABELS = {
@@ -20,12 +17,6 @@ const DEFAULT_LABELS = {
   chat: "ChatDialog",
 };
 
-/**
- * Bundles MindMap, MarkdownTree and ChatDialog into a single drop-in
- * component. All three share one tree (controlled or uncontrolled), so an edit
- * in any view — including a MindMap embedded in a chat reply — updates the
- * others immediately.
- */
 export const ChatWorkspace = ({
   defaultValue,
   onChange,
@@ -39,63 +30,77 @@ export const ChatWorkspace = ({
   chatHeight = 560,
   chatAttachmentHeight = 360,
   className,
-  jsonValue
+  jsonValue,
+  jsonOnChange,
 }: ChatWorkspaceProps) => {
-
-  // const handleChatSubmit = useCallback(
-  //   async (input: string): Promise<ChatReply> => {
-  //     const data = await generateMindmap(input);
-  //     console.log("yanx2");
-  //     console.log(data);
-
-  //     const result = convertToMindMap(
-  //       data.jsonValue, // { topics: [...] }
-  //       "Summary", // root node heading (default: "Mind Map")
-  //       "A summary of your questions", // root node subtext (optional)
-  //       "Here is the mind map.", // top-level `content` field (optional)
-  //     );
-  //     console.log(result);
-  //     setTree(result.attachment.tree as MarkdownTreeNode[]);
-  //     return {
-  //       content: data.markdown,
-  //       attachment: result.attachment as { type: "mindmap"; tree: MarkdownTreeNode[] },
-  //     };
-  //   },
-  //   [],
-  // );
-
-  const formattedJson = jsonValue && convertToMindMap(
-        jsonValue, 
-        "Summary", 
-        "A summary of your questions", 
-        "Here is the mind map.",
-      );
-
-  const isControlled = formattedJson ;
   const [internal, setInternal] = useState<MarkdownTreeNode[]>(
     defaultValue ?? [],
   );
-  const tree = isControlled ? (formattedJson.attachment?.tree as MarkdownTreeNode[]) : internal;
+
+  // Convert jsonValue to the mindmap format. Memoized so the effect below only
+  // fires when jsonValue actually changes, not on every render.
+  const formattedJson = useMemo(
+    () =>
+      jsonValue
+        ? convertToMindMap(
+            jsonValue,
+            "Summary",
+            "A summary of your questions",
+            "Here is the mind map.",
+          )
+        : null,
+    [jsonValue],
+  );
+
+  // Sync jsonValue → internal tree whenever the caller applies new JSON.
+  useEffect(() => {
+    if (formattedJson) {
+      setInternal(formattedJson.attachment.tree as MarkdownTreeNode[]);
+    }
+  }, [formattedJson]);
+
+  // Single source of truth: always the internal state. Both JSON application
+  // (via the effect above) and backend replies (via the wrapped submit below)
+  // flow through setInternal so all three panels stay in sync.
+  const tree = internal;
 
   const setTree = useCallback(
     (next: MarkdownTreeNode[]) => {
-      if (!isControlled) setInternal(next);
+      setInternal(next);
       onChange?.(next);
-      // jsonOnChange();
+      const test = convertFromMindMap({ content: "", attachment: { type: "mindmap", tree: next } });
+      console.log('yanx123-1');
+      console.log(test);
+      jsonOnChange?.(test);
     },
-    [isControlled, onChange],
+    [onChange],
   );
 
-  // Build a chat responder: an explicit handler wins, otherwise every send
-  // resolves to the JSON passed via `mindMapJson`, falling back to the locally
-  // bundled `question.json` — no backend call either way.
   const localSubmit = useCallback(
     async (_input: string): Promise<ChatReply> => mindMapJson ?? localReply,
     [mindMapJson],
   );
 
-  const chatSubmit = onChatSubmit ?? localSubmit;
+  const baseChatSubmit = onChatSubmit ?? localSubmit;
 
+  // Intercept every reply: if it carries a mindmap tree, push it into the
+  // shared tree so the MindMap and MarkdownTree panels update immediately.
+  const chatSubmit = useCallback(
+    async (input: string): Promise<string | ChatReply> => {
+      const raw = await baseChatSubmit(input);
+      const reply: ChatReply = typeof raw === "string" ? { content: raw } : raw;
+      if (
+        reply.attachment?.type === "mindmap" &&
+        Array.isArray(reply.attachment.tree)
+      ) {
+        setTree(reply.attachment.tree as MarkdownTreeNode[]);
+      }
+      return raw;
+    },
+    [baseChatSubmit, setTree],
+  );
+
+  // Seed ChatDialog with the initial mindmap when jsonValue is provided.
   const chatDefaultMessages = useMemo<ChatMessage[] | undefined>(() => {
     if (!formattedJson) return undefined;
     return [
@@ -103,7 +108,10 @@ export const ChatWorkspace = ({
         id: "init-mindmap",
         role: "assistant",
         content: formattedJson.content,
-        attachment: formattedJson.attachment as { type: "mindmap"; tree: MarkdownTreeNode[] },
+        attachment: formattedJson.attachment as {
+          type: "mindmap";
+          tree: MarkdownTreeNode[];
+        },
         createdAt: 0,
       },
     ];
@@ -132,7 +140,6 @@ export const ChatWorkspace = ({
 
       {showChat && (
         <section className="rcl-chat-workspace__section">
-          {/* {resolvedLabels && <h2>{resolvedLabels.chat}</h2>} */}
           <ChatDialog
             height={chatHeight}
             attachmentHeight={chatAttachmentHeight}

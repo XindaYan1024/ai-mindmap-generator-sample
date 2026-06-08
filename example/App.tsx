@@ -125,6 +125,11 @@ export const App = () => {
     };
   }, [showDemo]);
 
+  useCallback(() => {
+    console.log("yanx123", tree);
+    console.log("yanx123", jsonValue);
+  }, [tree]);
+
   return (
     <div
       style={{

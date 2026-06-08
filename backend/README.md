@@ -36,7 +36,7 @@ Configure the AI provider in `.env` (see `.env.example`):
 ## Run
 
 ```bash
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main:app --reload --port 8089
 ```
 
 ## API

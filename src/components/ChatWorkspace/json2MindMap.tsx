@@ -26,6 +26,35 @@ export interface MindMapOutput {
   };
 }
 
+/**
+ * Reverse of convertToMindMap.
+ * Converts a question.json-shaped MindMapOutput back to a mockedAPI.json-shaped MindMapInput.
+ *
+ * Parsing rules (mirrors the encoding in convertToMindMap):
+ *   section content  "## Topic Title"           → topic.title
+ *   subtopic content "**Subtopic**\n\nDesc..."  → subtopic.title + subtopic.description
+ */
+export function convertFromMindMap(output: MindMapOutput): MindMapInput {
+  const root = output.attachment.tree[0];
+  if (!root) return { topics: [] };
+
+  const topics: Topic[] = (root.children ?? []).map((section) => {
+    const title = section.content.replace(/^##\s*/, "").trim();
+
+    const subtopics: Subtopic[] = (section.children ?? []).map((node) => {
+      const match = node.content.match(/^\*\*(.+?)\*\*\n\n([\s\S]*)$/);
+      if (match) {
+        return { title: match[1].trim(), description: match[2].trim() };
+      }
+      return { title: node.content.trim(), description: "" };
+    });
+
+    return { title, subtopics };
+  });
+
+  return { topics };
+}
+
 export function convertToMindMap(
   input: MindMapInput,
   rootTitle = "Mind Map",
