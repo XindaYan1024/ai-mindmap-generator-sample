@@ -7,7 +7,7 @@ import type { ChatMessage, ChatReply } from "../ChatDialog/types";
 import type { ChatWorkspaceProps } from "./types";
 import questionReply from "../../question.json";
 import "./ChatWorkspace.css";
-import { generateMindmap } from "./api";
+// import { generateMindmap } from "./api";
 import { convertToMindMap } from "./json2MindMap";
 
 // Static reply loaded in place of a backend call. Its structure matches the

@@ -1,8 +1,8 @@
 /// <reference types="vite/client" />
 // Thin client for the mind-map backend (backend/app/routes/generate.py).
-// Override the base URL with a VITE_API_BASE env var; defaults to localhost:8000.
+// Override the base URL with a VITE_API_BASE env var; defaults to localhost:8089.
 const API_BASE =
-  (import.meta.env.VITE_API_BASE as string | undefined) ?? 'http://localhost:8000';
+  (import.meta.env.VITE_API_BASE as string | undefined) ?? 'https://localhost:8089';
 import { markdownToMindmapData } from './markdownToJson';
 
 interface GenerateResponse {
