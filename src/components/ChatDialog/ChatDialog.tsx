@@ -27,7 +27,7 @@ export const ChatDialog = ({
   onMindMapChange,
   attachmentHeight = 360,
   title = 'Chat',
-  placeholder = 'Type a message and press Enter…',
+  placeholder = 'Ask AI to create template mindmap…',
   height = 480,
   className,
 }: ChatDialogProps) => {

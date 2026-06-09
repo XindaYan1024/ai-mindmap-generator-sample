@@ -56,7 +56,7 @@ SYSTEM_PROMPT = """You are a mind-map generator. Given a topic or question, you 
 ## OUTPUT RULES — READ CAREFULLY
 - Respond with ONLY the Markdown. No preamble, no explanation, no code fences.
 - Use exactly ONE H1 (`# `) line: the main topic. It must be the first line.
-- Use H2 (`## `) lines for subtopics. Provide 3-6 subtopics.
+- Use H2 (`## `) lines for subtopics. Provide at least 5 subtopics (more if the topic warrants it), unless the user explicitly requests a specific number.
 - Under each subtopic, use `- ` bullet points for supporting points. Provide 2-5 bullets each.
 - Under each supporting point, add EXACTLY ONE nested bullet, indented by two spaces, containing a single complete sentence that describes or explains that point.
 - Keep the H1, H2, and supporting-point lines short (a few words). Only the nested description line is a full sentence. No paragraphs.
@@ -103,6 +103,18 @@ def _normalize_markdown(text: str) -> str:
         first, _, rest = text.partition("\n")
         heading = first.lstrip("#").strip() or "Mind Map"
         text = f"# {heading}\n{rest}".strip()
+
+    # Pad to at least 5 ## topics if the model returned fewer
+    lines = text.split("\n")
+    topic_count = sum(1 for ln in lines if ln.startswith("## "))
+    if topic_count < 5:
+        h1_title = lines[0].lstrip("# ").strip() if lines else "Topic"
+        for i in range(topic_count + 1, 6):
+            text += (
+                f"\n\n## Additional Aspect {i}\n"
+                f"- Key point\n"
+                f"  - This covers an additional aspect of {h1_title}.\n"
+            )
 
     return text
 

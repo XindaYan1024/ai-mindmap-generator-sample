@@ -16,22 +16,27 @@ interface ChatMindMapAttachmentProps {
   onChange?: (next: MarkdownTreeNode[]) => void;
 }
 
+// Maximize-window style: a framed rectangle with an arrow launching out of the top-right corner.
 const ExpandIcon = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" fill="none">
+    <rect x="1.5" y="4" width="8.5" height="7.5" rx="1" stroke="currentColor" strokeWidth="1.5" />
     <path
-      d="M2 5V2h3M9 2h3v3M12 9v3H9M5 12H2V9"
+      d="M8.5 1.5H12.5V5.5"
       stroke="currentColor"
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
+    <line x1="8" y1="6" x2="12.5" y2="1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 );
 
+// Restore-window style: two overlapping rectangles (browser restore metaphor).
 const CollapseIcon = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" fill="none">
+    <rect x="1.5" y="4.5" width="7.5" height="7.5" rx="1" stroke="currentColor" strokeWidth="1.5" />
     <path
-      d="M5 2v3H2M9 5h3V2M9 12V9h3M5 9H2v3"
+      d="M5 4.5V2.5a1 1 0 0 1 1-1h5.5a1 1 0 0 1 1 1V8a1 1 0 0 1-1 1H10"
       stroke="currentColor"
       strokeWidth="1.5"
       strokeLinecap="round"
