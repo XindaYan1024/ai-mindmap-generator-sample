@@ -44,6 +44,15 @@ const generateId = () =>
 // one after another in BFS order. Purely presentational.
 const LEVEL_APPEAR_DELAY = 130;
 
+// ── Branch color palette ────────────────────────────────────────────────────
+// Split into warm and cool groups so colors are assigned by alternating group
+// (warm, cool, warm, cool …) rather than sequentially. This guarantees that
+// even 2–3 top-level nodes get visually distinct, cross-family colors.
+const WARM_COLORS = ['#E05A5A', '#E07832', '#C8942A', '#C85A8A'] as const; // rose, orange, amber, rose-pink
+const COOL_COLORS = ['#5AAB80', '#7B6EC8', '#4A8EC8', '#3A9696'] as const; // sage-green, lavender, blue, teal
+// Dark navy-gray for root nodes (matches the first reference image).
+const ROOT_NODE_COLOR = '#3D4566';
+
 const nodeTypes: NodeTypes = {
   mindmap: MindMapNode,
 };
@@ -177,6 +186,45 @@ const MindMapInner = ({
     return map;
   }, [tree]);
 
+  // Maps every node id → its branch color (UI-only, no effect on data/layout).
+  // Roots → ROOT_NODE_COLOR. First-level children → rotating palette entries.
+  // Deeper descendants → inherit the color of their first-level ancestor.
+  const branchColorMap = useMemo(() => {
+    const map = new Map<string, string>();
+
+    for (const item of flatItems) {
+      if (item.parentId === null) map.set(item.id, ROOT_NODE_COLOR);
+    }
+
+    let warmIdx = 0;
+    let coolIdx = 0;
+    let branchCount = 0;
+    for (const item of flatItems) {
+      if (item.parentId !== null && map.get(item.parentId) === ROOT_NODE_COLOR) {
+        // Alternate warm → cool → warm → cool … for guaranteed cross-family diversity.
+        const color = branchCount % 2 === 0
+          ? WARM_COLORS[warmIdx++ % WARM_COLORS.length]
+          : COOL_COLORS[coolIdx++ % COOL_COLORS.length];
+        map.set(item.id, color);
+        branchCount++;
+      }
+    }
+
+    // Propagate color down to all deeper descendants.
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const item of flatItems) {
+        if (!map.has(item.id) && item.parentId && map.has(item.parentId)) {
+          map.set(item.id, map.get(item.parentId)!);
+          changed = true;
+        }
+      }
+    }
+
+    return map;
+  }, [flatItems]);
+
   const childCountByParent = useMemo(() => {
     const map = new Map<string, number>();
     for (const item of flatItems) {
@@ -209,6 +257,7 @@ const MindMapInner = ({
             isDropTarget: dropTargetId === item.id,
             appearDelay: (depthById.get(item.id) ?? 0) * LEVEL_APPEAR_DELAY,
             side: autoPositions.get(item.id)?.side,
+            color: branchColorMap.get(item.id),
             onAddChild: (id: string) => handlersRef.current.handleAddChild(id),
             onDelete: (id: string) => handlersRef.current.handleDelete(id),
             onUpdate: (id: string, c: string) =>
@@ -225,6 +274,7 @@ const MindMapInner = ({
       autoPositions,
       childCountByParent,
       depthById,
+      branchColorMap,
       renderMarkdown,
       editable,
       dropTargetId,
@@ -240,18 +290,20 @@ const MindMapInner = ({
         const sourceSide = autoPositions.get(source)?.side;
         const isRootSource = sourceSide === 'root';
         const isLeftTarget = autoPositions.get(target)?.side === 'left';
+        const edgeColor = branchColorMap.get(target) ?? '#6b7280';
         return {
           id: `${source}->${target}`,
           source,
           target,
           type: 'smoothstep',
+          style: { stroke: edgeColor, strokeWidth: 2 },
           // Root in balanced layout has two source handles; pick the correct one.
           ...(isRootSource
             ? { sourceHandle: isLeftTarget ? 'source-left' : 'source-right' }
             : {}),
         };
       }),
-    [tree, autoPositions],
+    [tree, autoPositions, branchColorMap],
   );
 
   const onNodesChange = useCallback(
@@ -368,7 +420,7 @@ const MindMapInner = ({
       className={['rcl-mind-map', className].filter(Boolean).join(' ')}
       style={{ height }}
     >
-      <div className="rcl-mind-map__toolbar">
+      {/* <div className="rcl-mind-map__toolbar">
         <button type="button" onClick={handleAddRoot}>
           + Add root node
         </button>
@@ -378,7 +430,7 @@ const MindMapInner = ({
         <span className="rcl-mind-map__hint">
           Tip: drop a node on another node to re-parent it.
         </span>
-      </div>
+      </div> */}
 
       <div className="rcl-mind-map__canvas" ref={canvasRef}>
         {nodes.length === 0 ? (

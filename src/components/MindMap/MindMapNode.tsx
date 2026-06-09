@@ -21,6 +21,8 @@ export interface MindMapNodeData {
   appearDelay?: number;
   /** Layout side: 'left' mirrors handles; 'root' adds dual source handles. */
   side?: 'left' | 'right' | 'root';
+  /** Branch color hex (e.g. '#E05A5A'). Drives background + text color. */
+  color?: string;
   onAddChild: (id: string) => void;
   onDelete: (id: string) => void;
   onUpdate: (id: string, content: string) => void;
@@ -40,6 +42,7 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
     isDropTarget,
     appearDelay,
     side,
+    color,
     onUpdate,
     onAddContent,
     onRemoveContent,
@@ -95,6 +98,8 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
         // Leaf nodes are twice as wide; height is left to content as before.
         width: hasChildren ? NODE_WIDTH : LEAF_NODE_WIDTH,
         ...(appearDelay ? { animationDelay: `${appearDelay}ms` } : {}),
+        // Branch color: overrides CSS defaults for background and text.
+        ...(color ? { backgroundColor: color, color: '#ffffff' } : {}),
       }}
       onDoubleClick={handleDoubleClick}
     >

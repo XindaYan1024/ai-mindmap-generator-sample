@@ -48,38 +48,56 @@
   padding: 8px 10px;
   background: #fafafa;
   border-bottom: 1px solid #f3f4f6;
+  max-height: 60px;
+  overflow: hidden;
+  transition: max-height 220ms cubic-bezier(0.4, 0, 0.2, 1),
+    padding 220ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 180ms ease,
+    border-color 180ms ease;
+}
+
+/* Collapse and fade the toolbar whenever the panel is compact (manual minimize
+   or while a reply is in flight). The maximize icon moves into the composer row. */
+.rcl-chat-input-panel--compact .rcl-chat-input-panel__toolbar {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  border-bottom-color: transparent;
+  pointer-events: none;
 }
 
 .rcl-chat-input-panel__tool {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  color: #374151;
-  background: #ffffff;
-  border: 1px solid #d1d5db;
+  color: #e24ab7;
+  background: light-dark(#ffffff, #60cdff);
+  border: 1px solid #e24ab7;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 120ms ease, color 120ms ease,
-    border-color 120ms ease;
+  transition: background-color 120ms ease, border-color 120ms ease,
+    opacity 120ms ease;
 }
 
 .rcl-chat-input-panel__tool:focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid #e24ab7;
   outline-offset: 2px;
 }
 
 .rcl-chat-input-panel__tool:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: #c0186a;
+  border-color: #c0186a;
+  color: #ffffff;
 }
 
 .rcl-chat-input-panel__tool[aria-pressed='true'] {
-  background: #eef2ff;
-  border-color: #c7d2fe;
-  color: #3730a3;
+  background: #c0186a;
+  border-color: #c0186a;
+  color: #ffffff;
 }
 
 /* ── History (collapsible) ──────────────────────────────────────────────────
@@ -187,6 +205,118 @@
   }
 }
 
+/* ── Bottom slot: thinking indicator + composer share the same height ────── */
+.rcl-chat-input-panel__bottom {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Thinking indicator (shown while isPending) ─────────────────────────── */
+.rcl-chat-input-panel__thinking {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: #fff0f6;
+  border-top: 1px solid #ffd6e8;
+  border-radius: 0 0 16px 16px;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.rcl-chat-input-panel__thinking--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.rcl-chat-input-panel__thinking-dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.rcl-chat-input-panel__thinking-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: rcl-cip-think-dot 1.2s infinite ease-in-out;
+}
+
+.rcl-chat-input-panel__thinking-dot:nth-child(1) {
+  background: #d63384;
+}
+
+.rcl-chat-input-panel__thinking-dot:nth-child(2) {
+  background: #e24ab7;
+  animation-delay: 0.2s;
+}
+
+.rcl-chat-input-panel__thinking-dot:nth-child(3) {
+  background: #f08dc8;
+  animation-delay: 0.4s;
+}
+
+@keyframes rcl-cip-think-dot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.65;
+  }
+  30% {
+    transform: translateY(-7px);
+    opacity: 1;
+  }
+}
+
+.rcl-chat-input-panel__thinking-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rcl-chat-input-panel__thinking-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #c0186a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.rcl-chat-input-panel__thinking-status {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  animation: rcl-cip-status-fade 1.8s infinite ease-in-out;
+}
+
+@keyframes rcl-cip-status-fade {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* The maximize button inside the composer row — larger than the toolbar buttons. */
+.rcl-chat-input-panel__composer .rcl-chat-input-panel__tool {
+  width: 38px;
+  height: 38px;
+  background: light-dark(#ffffff, #60cdff);
+  border-color: #e24ab7;
+  color: #e24ab7;
+}
+
+.rcl-chat-input-panel__composer .rcl-chat-input-panel__tool:hover {
+  background: #ffffff;
+  border-color: #c0186a;
+  color: #e24ab7;
+}
+
 /* ── Composer (always visible) ──────────────────────────────────────────── */
 .rcl-chat-input-panel__composer {
   display: flex;
@@ -195,6 +325,13 @@
   padding: 10px 12px;
   background: #fafafa;
   border-top: 1px solid #f3f4f6;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.rcl-chat-input-panel__composer--hidden {
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
 }
 
 .rcl-chat-input-panel__input {
@@ -214,8 +351,8 @@
 }
 
 .rcl-chat-input-panel__input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+  border-color: #e24ab7;
+  box-shadow: 0 0 0 3px rgba(226, 74, 183, 0.18);
 }
 
 .rcl-chat-input-panel__input:disabled {
@@ -225,13 +362,15 @@
 
 .rcl-chat-input-panel__send {
   flex: 0 0 auto;
-  padding: 9px 16px;
-  font-size: 13px;
-  font-weight: 500;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   color: #ffffff;
-  /* background: #2563eb; */
   background: light-dark(#e24ab7, #60cdff);
-  border: 1px solid #2563eb;
+  border: 1px solid #e24ab7;
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 120ms ease, border-color 120ms ease,

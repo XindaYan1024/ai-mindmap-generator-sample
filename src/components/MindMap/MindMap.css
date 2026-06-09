@@ -55,12 +55,12 @@
   position: relative;
   /* Width is set inline from the NODE_WIDTH constant (single source of truth). */
   background: #f3f4f6;
-  border: 1px solid #d1d5db;
+  border: 1px solid transparent;
   border-radius: 8px;
   padding: 8px 10px;
   font-size: 13px;
   color: #111827;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
 /* Enter animation: scale-in + fade-in. Runs once per node on mount; combined
@@ -148,6 +148,9 @@
   border-radius: 6px;
   resize: vertical;
   box-sizing: border-box;
+  /* Ensure editor text is always dark regardless of inherited node color. */
+  color: #111827;
+  background: #ffffff;
 }
 
 .rcl-mind-map__actions {
