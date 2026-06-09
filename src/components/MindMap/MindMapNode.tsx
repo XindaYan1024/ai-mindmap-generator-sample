@@ -111,10 +111,10 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
         />
       )}
 
-      {onAddContent && (
+      {onAddContent && hasParent && (contents ?? []).length > 0 && (
         <div className="rcl-mind-map__actions nodrag">
           <ContentBadge
-            contents={contents ?? []}
+            contents={contents}
             onAdd={() => onAddContent(id)}
             onRemove={(item) => onRemoveContent?.(id, item)}
           />
