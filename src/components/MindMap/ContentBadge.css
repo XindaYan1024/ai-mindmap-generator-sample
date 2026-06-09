@@ -1,0 +1,132 @@
+.rcl-content-badge {
+  position: relative;
+  display: inline-flex;
+}
+
+.rcl-content-badge__btn-add {
+  font-size: 12px;
+  padding: 0 10px;
+  color: #6b7280;
+  border-color: #d1d5db;
+  background: #ffffff;
+}
+
+.rcl-content-badge__btn-add:hover {
+  color: #2563eb;
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.rcl-content-badge__btn-count {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 10px;
+  color: #ffffff;
+  background: #2563eb;
+  border-color: #2563eb;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+}
+
+.rcl-content-badge__btn-count:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+  color: #ffffff;
+}
+
+/* Dropdown */
+.rcl-content-badge__dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 220px;
+  max-width: 300px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
+  z-index: 9999;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+.rcl-content-badge__dropdown-header {
+  padding: 8px 12px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.rcl-content-badge__list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.rcl-content-badge__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  cursor: default;
+}
+
+.rcl-content-badge__item:hover {
+  background: #f9fafb;
+}
+
+.rcl-content-badge__item-name {
+  flex: 1;
+  font-size: 13px;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.rcl-content-badge__item-remove {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 10px;
+  padding: 0;
+  transition: background-color 100ms ease, color 100ms ease;
+}
+
+.rcl-content-badge__item-remove:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.rcl-content-badge__add-more {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 500;
+  color: #2563eb;
+  background: none;
+  border: none;
+  border-top: 1px solid #f3f4f6;
+  cursor: pointer;
+  transition: background-color 100ms ease;
+}
+
+.rcl-content-badge__add-more:hover {
+  background: #eff6ff;
+}

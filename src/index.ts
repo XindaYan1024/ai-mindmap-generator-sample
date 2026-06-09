@@ -1,5 +1,5 @@
-export { MindMap } from './components/MindMap';
-export type { MindMapProps } from './components/MindMap';
+export { MindMap, ContentBadge } from './components/MindMap';
+export type { MindMapProps, ContentBadgeProps } from './components/MindMap';
 
 export {
   MarkdownTree,

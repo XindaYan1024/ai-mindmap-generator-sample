@@ -152,37 +152,43 @@
 
 .rcl-mind-map__actions {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: -14px;
+  right: 8px;
   display: flex;
   gap: 4px;
   z-index: 1;
 }
 
 .rcl-mind-map__icon-btn {
-  width: 24px;
-  height: 24px;
+  height: 28px;
+  min-width: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 0 8px;
   border: 1px solid #d1d5db;
   background: #ffffff;
-  color: #4b5563;
-  border-radius: 50%;
+  color: #374151;
+  border-radius: 14px;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   transition: background-color 120ms ease, border-color 120ms ease,
-    color 120ms ease, transform 80ms ease;
+    color 120ms ease, transform 80ms ease, box-shadow 120ms ease;
+  white-space: nowrap;
 }
 
 .rcl-mind-map__icon-btn:hover {
   background: #f3f4f6;
+  border-color: #9ca3af;
   color: #111827;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 }
 
 .rcl-mind-map__icon-btn:active {
-  transform: scale(0.92);
+  transform: scale(0.95);
 }
 
 .rcl-mind-map__icon-btn:focus-visible {
@@ -190,14 +196,36 @@
   outline-offset: 2px;
 }
 
-.rcl-mind-map__icon-btn--delete {
-  color: #b91c1c;
-  border-color: #fecaca;
+.rcl-mind-map__icon-btn--count {
+  width: auto;
+  padding: 0 10px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #2563eb;
+  border-color: #2563eb;
+  gap: 6px;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35);
 }
 
-.rcl-mind-map__icon-btn--delete:hover {
-  background: #fef2f2;
-  color: #991b1b;
+.rcl-mind-map__icon-btn--count:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.45);
+}
+
+.rcl-mind-map__icon-btn--count-num {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.rcl-mind-map__icon-btn--count-del {
+  font-size: 11px;
+  opacity: 0.9;
+  line-height: 1;
+  font-weight: 400;
 }
 
 .rcl-mind-map__edit-actions {

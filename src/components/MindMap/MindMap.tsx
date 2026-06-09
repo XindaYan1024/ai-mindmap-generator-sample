@@ -56,6 +56,9 @@ const MindMapInner = ({
   editable = true,
   height = 480,
   className,
+  nodeContents,
+  onAddContent,
+  onRemoveContent,
 }: MindMapProps) => {
   const isControlled = value !== undefined;
   const [internal, setInternal] = useState<MarkdownTreeNode[]>(defaultValue ?? []);
@@ -210,6 +213,9 @@ const MindMapInner = ({
             onDelete: (id: string) => handlersRef.current.handleDelete(id),
             onUpdate: (id: string, c: string) =>
               handlersRef.current.handleUpdate(id, c),
+            onAddContent,
+            onRemoveContent,
+            contents: nodeContents?.[item.id] ?? item.contents,
           },
         };
       }),
@@ -222,6 +228,9 @@ const MindMapInner = ({
       renderMarkdown,
       editable,
       dropTargetId,
+      nodeContents,
+      onAddContent,
+      onRemoveContent,
     ],
   );
 

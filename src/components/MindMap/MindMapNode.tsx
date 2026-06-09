@@ -8,6 +8,7 @@ import {
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import ReactMarkdown from 'react-markdown';
 import { NODE_WIDTH, LEAF_NODE_WIDTH } from './layout';
+import { ContentBadge } from './ContentBadge';
 
 export interface MindMapNodeData {
   content: string;
@@ -23,6 +24,9 @@ export interface MindMapNodeData {
   onAddChild: (id: string) => void;
   onDelete: (id: string) => void;
   onUpdate: (id: string, content: string) => void;
+  onAddContent?: (nodeId: string) => void;
+  onRemoveContent?: (nodeId: string, item: any) => void;
+  contents?: any[];
   [key: string]: unknown;
 }
 
@@ -37,6 +41,9 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
     appearDelay,
     side,
     onUpdate,
+    onAddContent,
+    onRemoveContent,
+    contents,
   } = data as MindMapNodeData;
 
   const isLeft = side === 'left';
@@ -97,6 +104,16 @@ const MindMapNodeImpl = ({ id, data, selected }: NodeProps) => {
           position={isLeft ? Position.Right : Position.Left}
           className="rcl-mind-map__handle"
         />
+      )}
+
+      {onAddContent && (
+        <div className="rcl-mind-map__actions nodrag">
+          <ContentBadge
+            contents={contents ?? []}
+            onAdd={() => onAddContent(id)}
+            onRemove={(item) => onRemoveContent?.(id, item)}
+          />
+        </div>
       )}
 
       <div className="rcl-mind-map__node-content">

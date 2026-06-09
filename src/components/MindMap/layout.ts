@@ -192,8 +192,8 @@ export const collectEdges = (
  */
 export const flattenForMindMap = (
   tree: MarkdownTreeNode[],
-): Array<{ id: string; content: string; parentId: string | null }> => {
-  const out: Array<{ id: string; content: string; parentId: string | null }> = [];
+): Array<{ id: string; content: string; parentId: string | null; contents?: any[] }> => {
+  const out: Array<{ id: string; content: string; parentId: string | null; contents?: any[] }> = [];
 
   type LevelEntry = { node: MarkdownTreeNode; parentId: string | null };
 
@@ -201,7 +201,7 @@ export const flattenForMindMap = (
     if (level.length === 0) return;
     const nextLevel: LevelEntry[] = [];
     for (const { node, parentId } of level) {
-      out.push({ id: node.id, content: node.content, parentId });
+      out.push({ id: node.id, content: node.content, parentId, contents: node.contents });
       for (const child of node.children ?? []) {
         nextLevel.push({ node: child, parentId: node.id });
       }

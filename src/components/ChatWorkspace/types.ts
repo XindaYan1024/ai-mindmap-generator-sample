@@ -52,4 +52,10 @@ export interface ChatWorkspaceProps {
   className?: string;
   jsonValue?: any;
   jsonOnChange?: (next: any) => void;
+  /** Forwarded to MindMap — external map of nodeId → selected content items. */
+  nodeContents?: Record<string, any[]>;
+  /** Forwarded to MindMap — called when the component wants to trigger content selection for a node. */
+  onAddContent?: (nodeId: string) => void;
+  /** Forwarded to MindMap — called when the user removes a single content item from a node. */
+  onRemoveContent?: (nodeId: string, item: any) => void;
 }

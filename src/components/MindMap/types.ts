@@ -15,6 +15,12 @@ export interface MindMapProps {
   height?: number | string;
   /** Extra class name for the wrapper. */
   className?: string;
+  /** External map of nodeId → selected content items, rendered on each node. */
+  nodeContents?: Record<string, any[]>;
+  /** Called when the component wants to trigger content selection for a specific node. */
+  onAddContent?: (nodeId: string) => void;
+  /** Called when the user removes a single content item from a node. */
+  onRemoveContent?: (nodeId: string, item: any) => void;
 }
 
 /** Position assigned by the auto-layout. */

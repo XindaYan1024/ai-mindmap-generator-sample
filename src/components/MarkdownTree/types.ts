@@ -3,6 +3,8 @@ export interface MarkdownTreeNode {
   /** Markdown content for the node. */
   content: string;
   children?: MarkdownTreeNode[];
+  /** Content items associated with this node (selected via content picker). */
+  contents?: any[];
 }
 
 /** Editing surfaces the component can present. */

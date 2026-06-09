@@ -323,6 +323,7 @@ export const App = () => {
                 onChatSubmit={handleChatSubmit}
                 mindMapJson={mindMapJson}
                 className="rcl-chat-workspace--fill"
+                onAddContent={(nodeId) => alert(`Add content for node: ${nodeId}`)}
               />
             </div>
           </div>

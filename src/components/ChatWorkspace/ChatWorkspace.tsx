@@ -32,6 +32,9 @@ export const ChatWorkspace = ({
   className,
   jsonValue,
   jsonOnChange,
+  nodeContents,
+  onAddContent,
+  onRemoveContent,
 }: ChatWorkspaceProps) => {
   const [internal, setInternal] = useState<MarkdownTreeNode[]>(
     defaultValue ?? [],
@@ -127,7 +130,7 @@ export const ChatWorkspace = ({
       {showMindMap && (
         <section className="rcl-chat-workspace__section">
           {resolvedLabels && <h2>{resolvedLabels.mindMap}</h2>}
-          <MindMap value={tree} onChange={setTree} height={mindMapHeight} />
+          <MindMap value={tree} onChange={setTree} height={mindMapHeight} nodeContents={nodeContents} onAddContent={onAddContent} onRemoveContent={onRemoveContent} />
         </section>
       )}
 
