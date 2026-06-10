@@ -23,16 +23,7 @@ export const ContentBadge = ({ contents, onAdd, onRemove }: ContentBadgeProps) =
   };
 
   if (contents.length === 0) {
-    return (
-      <button
-        type="button"
-        className="rcl-mind-map__icon-btn rcl-content-badge__btn-add"
-        onClick={(e) => { e.stopPropagation(); onAdd(); }}
-        title="Add content"
-      >
-        + Add
-      </button>
-    );
+    return null;
   }
 
   return (

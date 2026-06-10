@@ -478,6 +478,14 @@ const MindMapInner = ({
                 disabled: !findParent(tree, contextMenu.nodeId),
                 onSelect: () => handleAddSibling(contextMenu.nodeId),
               },
+              ...(onAddContent && flatItems.find(i => i.id === contextMenu.nodeId)?.parentId != null
+                ? [
+                    {
+                      label: 'Add content',
+                      onSelect: () => onAddContent(contextMenu.nodeId),
+                    },
+                  ]
+                : []),
               {
                 label: 'Delete node',
                 danger: true,
